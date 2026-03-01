@@ -1,0 +1,241 @@
+---
+title: Optimize commands
+description: Complete reference for all optimize subcommands
+---
+
+The `optimize` command group runs the full optimization pipeline: audit + tone extraction + content rewriting. All operations are asynchronous and return job IDs.
+
+## stobo optimize run
+
+Start a full optimization job that audits content, applies brand voice, and rewrites for SEO/AEO.
+
+```bash
+stobo optimize run <url> [options]
+```
+
+### Arguments
+
+<ParamField path="url" type="string" required>
+  URL of the article to optimize.
+</ParamField>
+
+### Options
+
+<ParamField path="--customer-id" type="string">
+  Customer ID for brand voice profile. If provided, applies the stored tone to rewrites. If not provided, optimization uses generic best practices.
+  
+  **Alias:** `-c`
+</ParamField>
+
+<ParamField path="--audit-id" type="string">
+  Reuse an existing audit UUID instead of running a new audit. Useful when you've already audited the URL and want to skip redundant analysis.
+</ParamField>
+
+<ParamField path="--no-wait" type="boolean" default={false}>
+  Return immediately with job ID without polling for completion. Useful for batch processing or when you want to check status manually.
+</ParamField>
+
+### Response fields
+
+Returns a JSON object containing:
+
+- `job_id` (string) - Unique UUID for this optimization job
+- `url` (string) - URL being optimized
+- `status` (string) - Job status: `pending`, `running`, `completed`, `failed`
+- `customer_id` (string) - Customer ID (if provided)
+- `audit_id` (string) - Associated audit UUID
+- `created_at` (string) - ISO 8601 timestamp
+
+### Examples
+
+<CodeGroup>
+```bash Basic optimization (wait for completion)
+stobo optimize run https://example.com/blog/post
+```
+
+```bash With brand voice
+stobo optimize run example.com/article --customer-id acme-corp
+```
+
+```bash Reuse existing audit
+stobo optimize run https://example.com/post --audit-id a3b2c1d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+```
+
+```bash Async mode (no wait)
+stobo optimize run https://example.com/post --no-wait
+```
+
+```bash Combined options
+stobo optimize run https://example.com/post -c acme-corp --no-wait
+```
+</CodeGroup>
+
+---
+
+## stobo optimize status
+
+Check the status of an optimization job.
+
+```bash
+stobo optimize status <job_id>
+```
+
+### Arguments
+
+<ParamField path="job_id" type="string" required>
+  Job UUID returned from `optimize run`.
+</ParamField>
+
+### Response fields
+
+Returns a JSON object containing:
+
+- `job_id` (string)
+- `status` (string) - `pending`, `running`, `completed`, `failed`
+- `url` (string)
+- `audit_id` (string)
+- `progress` (integer) - Completion percentage (0-100)
+- `error` (string) - Error message (if status is `failed`)
+- `created_at` (string)
+- `updated_at` (string)
+- `completed_at` (string) - ISO 8601 timestamp (if completed)
+
+### Examples
+
+```bash
+stobo optimize status 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
+```
+
+---
+
+## stobo optimize preview
+
+Show before/after preview for a completed optimization job.
+
+```bash
+stobo optimize preview <job_id>
+```
+
+### Arguments
+
+<ParamField path="job_id" type="string" required>
+  Job UUID for a completed optimization.
+</ParamField>
+
+### Response fields
+
+Returns a JSON object containing:
+
+- `job_id` (string)
+- `original` (object) - Original content metadata
+  - `title` (string)
+  - `meta_description` (string)
+  - `headings` (array)
+- `rewritten` (object) - Rewritten content metadata
+  - `title` (string)
+  - `meta_description` (string)
+  - `headings` (array)
+- `changes_count` (integer) - Total number of changes made
+- `issues_fixed` (integer) - Number of SEO/AEO issues resolved
+- `issues_skipped` (integer) - Number of issues not addressed
+
+### Examples
+
+<CodeGroup>
+```bash View preview
+stobo optimize preview 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
+```
+
+```bash JSON output
+stobo optimize preview 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d --json
+```
+</CodeGroup>
+
+---
+
+## stobo optimize jobs
+
+List optimization jobs with optional filtering.
+
+```bash
+stobo optimize jobs [options]
+```
+
+### Options
+
+<ParamField path="--status" type="string">
+  Filter by job status. Valid values: `pending`, `running`, `completed`, `failed`.
+  
+  **Alias:** `-s`
+</ParamField>
+
+<ParamField path="--limit" type="integer" default={20}>
+  Maximum number of results to return (1-100).
+  
+  **Alias:** `-n`
+</ParamField>
+
+### Response fields
+
+Returns an array of job objects, each containing:
+
+- `job_id` (string)
+- `url` (string)
+- `status` (string)
+- `customer_id` (string)
+- `created_at` (string)
+- `completed_at` (string)
+
+### Examples
+
+<CodeGroup>
+```bash List all jobs
+stobo optimize jobs
+```
+
+```bash Filter by status
+stobo optimize jobs --status completed
+```
+
+```bash Limit results
+stobo optimize jobs --limit 50
+```
+
+```bash Combined filters
+stobo optimize jobs -s running -n 10
+```
+</CodeGroup>
+
+---
+
+## Job polling behavior
+
+When running `optimize run` without `--no-wait`, the CLI polls the job status every **3 seconds** until it reaches a terminal state (`completed` or `failed`).
+
+### Terminal statuses
+
+- `completed` - Job finished successfully
+- `failed` - Job encountered an error
+
+### Polling interval
+
+The default polling interval is **3 seconds** (configurable in source at `stobo/commands/optimize.py:24`).
+
+---
+
+## Status codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 400 | Invalid parameters |
+| 401 | Missing or invalid API key |
+| 404 | Job not found |
+| 429 | Rate limit exceeded |
+| 500 | Server error |
+
+## Related commands
+
+- [audit commands](/api/audit-commands) - Run standalone audits
+- [tone commands](/api/tone-commands) - Manage brand voice profiles
+- [export commands](/api/export-commands) - Export optimization results

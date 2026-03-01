@@ -1,0 +1,154 @@
+---
+title: Installation
+description: Install Stobo CLI using pip and verify your installation.
+---
+
+## Prerequisites
+
+Before installing Stobo CLI, ensure you have:
+
+- **Python 3.10 or higher** installed on your system
+- **pip** (Python package manager)
+
+<Info>
+  You can check your Python version by running `python --version` or `python3 --version` in your terminal.
+</Info>
+
+## Install with pip
+
+Install Stobo CLI globally using pip:
+
+<CodeGroup>
+```bash pip
+pip install stobo
+```
+
+```bash pip3
+pip3 install stobo
+```
+
+```bash pipx (recommended)
+pipx install stobo
+```
+</CodeGroup>
+
+<Tip>
+  Using `pipx` is recommended as it installs the CLI in an isolated environment, preventing dependency conflicts with other Python packages.
+</Tip>
+
+## Verify installation
+
+Confirm that Stobo CLI is installed correctly:
+
+```bash
+stobo --version
+```
+
+You should see output similar to:
+
+```
+stobo 0.3.7
+```
+
+## Update Stobo CLI
+
+To update to the latest version:
+
+<CodeGroup>
+```bash pip
+pip install --upgrade stobo
+```
+
+```bash pipx
+pipx upgrade stobo
+```
+</CodeGroup>
+
+## System requirements
+
+Stobo CLI has minimal system requirements:
+
+| Requirement | Version |
+|-------------|----------|
+| Python | 3.10+ |
+| Operating System | Linux, macOS, Windows |
+| Dependencies | typer, httpx, rich, pydantic |
+
+<Note>
+  All dependencies are automatically installed when you install Stobo CLI via pip.
+</Note>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Command not found after installation">
+    If you get a "command not found" error after installation, your Python scripts directory may not be in your PATH.
+    
+    **Solution**: Add Python's bin directory to your PATH:
+    
+    ```bash
+    # For bash/zsh
+    export PATH="$HOME/.local/bin:$PATH"
+    
+    # For fish
+    set -gx PATH $HOME/.local/bin $PATH
+    ```
+    
+    Add this line to your shell configuration file (`~/.bashrc`, `~/.zshrc`, etc.) to make it permanent.
+  </Accordion>
+  
+  <Accordion title="Permission denied errors">
+    If you encounter permission errors during installation, try one of these solutions:
+    
+    1. Install for your user only:
+       ```bash
+       pip install --user stobo
+       ```
+    
+    2. Use `pipx` instead (recommended):
+       ```bash
+       pipx install stobo
+       ```
+  </Accordion>
+  
+  <Accordion title="Python version too old">
+    Stobo CLI requires Python 3.10 or higher. If you have an older version:
+    
+    1. Check your Python version: `python3 --version`
+    2. Install a newer Python version from [python.org](https://www.python.org/downloads/)
+    3. Use `python3.10` or higher explicitly when installing:
+       ```bash
+       python3.10 -m pip install stobo
+       ```
+  </Accordion>
+</AccordionGroup>
+
+## Uninstall
+
+To remove Stobo CLI from your system:
+
+<CodeGroup>
+```bash pip
+pip uninstall stobo
+```
+
+```bash pipx
+pipx uninstall stobo
+```
+</CodeGroup>
+
+<Warning>
+  Uninstalling Stobo CLI will not remove your stored API key. To clear your authentication data, run `stobo auth logout` before uninstalling.
+</Warning>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Run your first audit in under a minute
+  </Card>
+  
+  <Card title="Authentication" icon="key" href="/authentication">
+    Set up your API key for paid features
+  </Card>
+</CardGroup>

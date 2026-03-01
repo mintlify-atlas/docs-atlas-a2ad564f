@@ -1,0 +1,276 @@
+---
+title: stobo optimize
+description: Run full optimization pipeline with audit, tone extraction, and AI rewriting
+---
+
+## Overview
+
+The `stobo optimize` command runs a complete optimization pipeline that:
+
+1. **Audits** your content for SEO/AEO issues
+2. **Extracts** your brand voice (or uses existing tone profile)
+3. **Rewrites** content to fix issues while maintaining your brand voice
+
+This is an asynchronous job-based workflow perfect for batch optimization.
+
+<Info>
+  **Credit cost:** Optimize jobs combine multiple operations (audit + tone extraction + AI rewriting) and consume more credits than individual commands.
+</Info>
+
+---
+
+## Commands
+
+### stobo optimize run
+
+Start a full optimization job for a URL.
+
+```bash
+stobo optimize run <url> [options]
+```
+
+<ParamField path="url" type="string" required>
+  URL to optimize
+</ParamField>
+
+<ParamField path="--customer-id" type="string">
+  Customer ID for brand voice tone profile. Alias: `-c`
+</ParamField>
+
+<ParamField path="--audit-id" type="string">
+  Reuse an existing audit instead of running a new one
+</ParamField>
+
+<ParamField path="--no-wait" type="boolean" default="false">
+  Return job ID immediately without polling for completion
+</ParamField>
+
+#### Example
+
+```bash
+# Run optimization with brand voice
+stobo optimize run https://example.com/article --customer-id acme-corp
+
+# Reuse existing audit
+stobo optimize run https://example.com/article --audit-id a1b2c3d4-5678-90ab-cdef
+
+# Start job without waiting
+stobo optimize run https://example.com/article --no-wait
+```
+
+<Steps>
+  <Step title="Job submitted">
+    Stobo creates an optimization job and returns a job ID.
+  </Step>
+  
+  <Step title="Audit phase">
+    If no `--audit-id` provided, runs a full SEO/AEO audit.
+  </Step>
+  
+  <Step title="Tone extraction">
+    If `--customer-id` provided and tone profile exists, uses it. Otherwise, extracts tone from your content.
+  </Step>
+  
+  <Step title="Rewriting">
+    AI rewrites content to fix issues while maintaining brand voice.
+  </Step>
+  
+  <Step title="Completion">
+    Job status changes to `completed` with results.
+  </Step>
+</Steps>
+
+#### Output (with polling)
+
+```
+Optimizing... (completed)
+
+╭─────────────────────────────────────────────────────────────╮
+│ Optimization Job                                            │
+├─────────────────────────────────────────────────────────────┤
+│ Job: opt_a1b2c3d4567890                                     │
+│ Status: completed                                           │
+│ URL: https://example.com/article                            │
+╰─────────────────────────────────────────────────────────────╯
+  Tone alignment: 94%
+  Issues fixed: 12
+  Issues skipped: 2
+
+Credits: 8,450 / 10,000 remaining | Resets 2026-04-01
+```
+
+#### Output (--no-wait)
+
+```
+✓ Job started: opt_a1b2c3d4567890
+  Check status: stobo optimize status opt_a1b2c3d4567890
+```
+
+<Warning>
+  **Optimization jobs are asynchronous.** Without `--no-wait`, the CLI polls for completion. For long-running jobs, use `--no-wait` and check status separately.
+</Warning>
+
+---
+
+### stobo optimize status
+
+Check the status of an optimization job.
+
+```bash
+stobo optimize status <job_id>
+```
+
+<ParamField path="job_id" type="string" required>
+  Job UUID to check
+</ParamField>
+
+#### Example
+
+```bash
+stobo optimize status opt_a1b2c3d4567890
+```
+
+#### Job statuses
+
+- **pending**: Job queued, not started yet
+- **auditing**: Running SEO/AEO audit
+- **tone_extracting**: Extracting brand voice
+- **rewriting**: AI rewriting content
+- **completed**: Job finished successfully
+- **failed**: Job encountered an error
+
+#### Output
+
+```
+╭─────────────────────────────────────────────────────────────╮
+│ Optimization Job                                            │
+├─────────────────────────────────────────────────────────────┤
+│ Job: opt_a1b2c3d4567890                                     │
+│ Status: rewriting                                           │
+│ URL: https://example.com/article                            │
+╰─────────────────────────────────────────────────────────────╯
+```
+
+---
+
+### stobo optimize preview
+
+Show before/after preview for a completed optimization job.
+
+```bash
+stobo optimize preview <job_id>
+```
+
+<ParamField path="job_id" type="string" required>
+  Job UUID to preview
+</ParamField>
+
+#### Example
+
+```bash
+stobo optimize preview opt_a1b2c3d4567890
+```
+
+<Note>
+  This command only works for **completed** jobs. Use `stobo optimize status` to check job status first.
+</Note>
+
+#### Output
+
+```
+Original title: 10 Tips for AI Optimization
+Rewritten title: 10 AI Optimization Tips That Actually Work
+
+Changes: 47  Fixed: 12  Skipped: 2
+```
+
+---
+
+### stobo optimize jobs
+
+List your optimization jobs.
+
+```bash
+stobo optimize jobs [options]
+```
+
+<ParamField path="--status" type="string">
+  Filter by job status (pending, running, completed, failed). Alias: `-s`
+</ParamField>
+
+<ParamField path="--limit" type="integer" default="20">
+  Maximum number of results to return. Alias: `-n`
+</ParamField>
+
+#### Example
+
+```bash
+# List all jobs
+stobo optimize jobs
+
+# List only completed jobs
+stobo optimize jobs --status completed
+
+# List last 50 jobs
+stobo optimize jobs --limit 50
+```
+
+#### Output
+
+```
+                        Optimization Jobs
+┌──────────┬───────────────────────────────────┬───────────┬────────────┐
+│ Job ID   │ URL                               │ Status    │ Date       │
+├──────────┼───────────────────────────────────┼───────────┼────────────┤
+│ opt_a1b2 │ https://example.com/article-1     │ completed │ 2026-03-01 │
+│ opt_c3d4 │ https://example.com/article-2     │ rewriting │ 2026-03-01 │
+│ opt_e5f6 │ https://example.com/article-3     │ pending   │ 2026-02-28 │
+└──────────┴───────────────────────────────────┴───────────┴────────────┘
+```
+
+---
+
+## Workflow example
+
+Here's a complete workflow for optimizing multiple articles:
+
+<Steps>
+  <Step title="Extract brand voice once">
+    ```bash
+    stobo tone extract https://example.com/blog --customer-id acme-corp
+    ```
+  </Step>
+  
+  <Step title="Start optimization jobs">
+    ```bash
+    stobo optimize run https://example.com/article-1 --customer-id acme-corp --no-wait
+    stobo optimize run https://example.com/article-2 --customer-id acme-corp --no-wait
+    stobo optimize run https://example.com/article-3 --customer-id acme-corp --no-wait
+    ```
+  </Step>
+  
+  <Step title="Check job status">
+    ```bash
+    stobo optimize jobs --status running
+    ```
+  </Step>
+  
+  <Step title="Preview completed jobs">
+    ```bash
+    stobo optimize preview opt_a1b2c3d4567890
+    ```
+  </Step>
+</Steps>
+
+---
+
+## JSON output
+
+All optimize commands support JSON output using the global `--json` flag:
+
+```bash
+stobo optimize run https://example.com --json
+stobo optimize status opt_a1b2c3d4567890 --json
+```
+
+This returns structured data suitable for automation and CI/CD integration.

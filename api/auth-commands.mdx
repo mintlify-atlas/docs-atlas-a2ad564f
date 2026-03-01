@@ -1,0 +1,146 @@
+---
+title: Auth commands
+description: Complete reference for all auth subcommands
+---
+
+The `auth` command group manages API key authentication for Stobo CLI.
+
+## stobo auth login
+
+Save and validate an API key for future requests.
+
+```bash
+stobo auth login [options]
+```
+
+### Options
+
+<ParamField path="--api-key" type="string">
+  Your Stobo API key (starts with `sk_`). If not provided, you will be prompted interactively (with hidden input).
+  
+  **Alias:** `-k`
+</ParamField>
+
+### Behavior
+
+1. Validates the API key by calling `/api/v1/auth/me`
+2. Stores the key in `~/.stobo/config.json` with `600` permissions (owner-only)
+3. Stores the base URL if provided via `--base-url` global flag
+
+### Examples
+
+<CodeGroup>
+```bash Interactive prompt
+stobo auth login
+```
+
+```bash With API key
+stobo auth login --api-key sk_test_abc123
+```
+
+```bash Short form
+stobo auth login -k sk_test_abc123
+```
+
+```bash With custom base URL
+stobo --base-url https://api.custom.com auth login -k sk_test_abc123
+```
+</CodeGroup>
+
+---
+
+## stobo auth logout
+
+Clear the stored API key from local configuration.
+
+```bash
+stobo auth logout
+```
+
+### Behavior
+
+Deletes `~/.stobo/config.json` if it exists.
+
+### Examples
+
+```bash
+stobo auth logout
+```
+
+---
+
+## stobo auth status
+
+Show current authentication status and user information.
+
+```bash
+stobo auth status
+```
+
+### Response fields
+
+Displays:
+
+- **Email** - Account email address
+- **Name** - Full name (if available)
+- **Key** - First 8 characters of API key (masked)
+
+### Examples
+
+```bash
+stobo auth status
+```
+
+### Exit codes
+
+- `0` - Authenticated successfully
+- `1` - Not logged in or invalid API key
+
+---
+
+## Configuration file
+
+### Location
+
+```
+~/.stobo/config.json
+```
+
+### Structure
+
+```json
+{
+  "api_key": "sk_test_abc123",
+  "base_url": "https://api.trystobo.com"
+}
+```
+
+### Permissions
+
+The config file is created with `600` permissions (owner read/write only) for security.
+
+---
+
+## Authentication priority
+
+API keys are resolved in this order:
+
+1. `--api-key` flag (highest priority)
+2. `STOBO_API_KEY` environment variable
+3. `~/.stobo/config.json` file (lowest priority)
+
+---
+
+## Status codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Authentication successful |
+| 401 | Invalid API key |
+| 403 | API key lacks permissions |
+| 500 | Server error |
+
+## Related commands
+
+- [global options](/api/global-options) - Learn about `--api-key` flag
+- [environment variables](/api/environment-variables) - Configure via env vars

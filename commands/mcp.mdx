@@ -1,0 +1,115 @@
+---
+title: MCP commands
+description: Manage Stobo MCP server for Claude Desktop and Cursor
+---
+
+The `stobo mcp` commands help you install and manage the Stobo MCP (Model Context Protocol) server for use with Claude Desktop and Cursor.
+
+## stobo mcp install
+
+Install the Stobo MCP server into Claude Desktop and Cursor.
+
+```bash
+stobo mcp install [OPTIONS]
+```
+
+### Options
+
+<ParamField path="--api-key" type="string">
+  Stobo API key to configure (optional - free tools work without one)
+  
+  **Alias:** `-k`
+</ParamField>
+
+### Examples
+
+Install with free tools only:
+
+```bash
+stobo mcp install
+```
+
+Install with API key for full access:
+
+```bash
+stobo mcp install --api-key sk_your_api_key
+```
+
+Install with API key using short alias:
+
+```bash
+stobo mcp install -k sk_your_api_key
+```
+
+<Note>
+  The command automatically detects your operating system and installs the MCP server to the correct configuration location.
+</Note>
+
+### Free tools available without API key
+
+The following Stobo tools work without an API key:
+- `audit_site` - Site auditing
+- `audit_article` - Article analysis
+- `robots.txt` - Generate robots.txt files
+- `sitemap` - Generate sitemap.xml files
+- `freshness_code` - Generate freshness schema
+
+<Info>
+  After installation, restart Claude Desktop or Cursor for the changes to take effect.
+</Info>
+
+### Configuration locations
+
+The MCP server is installed to the following locations:
+
+**macOS (Claude Desktop):**
+```
+~/Library/Application Support/Claude/claude_desktop_config.json
+```
+
+**Windows (Claude Desktop):**
+```
+%APPDATA%\Claude\claude_desktop_config.json
+```
+
+**Linux (Claude Desktop):**
+```
+~/.config/Claude/claude_desktop_config.json
+```
+
+**All platforms (Cursor):**
+```
+~/.cursor/mcp.json
+```
+
+## stobo mcp uninstall
+
+Remove the Stobo MCP server from Claude Desktop and Cursor.
+
+```bash
+stobo mcp uninstall
+```
+
+### Examples
+
+Uninstall the MCP server:
+
+```bash
+stobo mcp uninstall
+```
+
+<Info>
+  After uninstalling, restart Claude Desktop or Cursor for the changes to take effect.
+</Info>
+
+## Prerequisites
+
+Before using the MCP commands, you need to install the `stobo-mcp` package:
+
+```bash
+pip install stobo-mcp
+```
+
+<Tip>
+  You can update your API key later by running `stobo mcp install --api-key <new_key>` again.
+</Tip>

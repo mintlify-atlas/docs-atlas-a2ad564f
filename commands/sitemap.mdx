@@ -1,0 +1,70 @@
+---
+title: Sitemap commands
+description: Generate sitemap.xml files by crawling websites
+---
+
+The `stobo sitemap` command crawls your website and generates a complete `sitemap.xml` file with all discovered internal pages.
+
+## stobo sitemap generate
+
+Generate a sitemap.xml by crawling a website's internal pages.
+
+```bash
+stobo sitemap generate <url> [OPTIONS]
+```
+
+<ParamField path="url" type="string" required>
+  Website URL to crawl and generate sitemap from
+</ParamField>
+
+### Options
+
+<ParamField path="--output" type="string">
+  Save the generated sitemap.xml to a file
+  
+  **Alias:** `-o`
+</ParamField>
+
+<ParamField path="--max-urls" type="integer" default="200">
+  Maximum number of URLs to discover and include in the sitemap. Valid range: 10-500
+  
+  **Alias:** `-n`
+</ParamField>
+
+### Examples
+
+Generate a sitemap with default settings:
+
+```bash
+stobo sitemap generate https://example.com
+```
+
+Generate a sitemap and save to file:
+
+```bash
+stobo sitemap generate https://example.com --output sitemap.xml
+```
+
+Generate a sitemap with up to 500 URLs:
+
+```bash
+stobo sitemap generate https://example.com --max-urls 500 -o sitemap.xml
+```
+
+Generate a small sitemap for testing:
+
+```bash
+stobo sitemap generate https://example.com -n 50
+```
+
+<Note>
+  The crawler discovers URLs by following internal links. The `--max-urls` parameter limits the number of pages included in the final sitemap.
+</Note>
+
+<Info>
+  Generated sitemaps follow the standard sitemap.xml format and can be submitted directly to search engines.
+</Info>
+
+<Tip>
+  For large sites, start with a smaller `--max-urls` value to test the output before generating a complete sitemap.
+</Tip>

@@ -1,0 +1,112 @@
+---
+title: credits
+description: View credit usage and balance
+---
+
+The `credits` command displays your current credit usage, balance, and breakdown by action type.
+
+## Usage
+
+```bash
+stobo credits
+```
+
+This command shows:
+
+- Your current plan
+- Credits remaining out of total
+- Credit reset date
+- Breakdown by action type (if available)
+
+**Example output:**
+
+```
+╭─────── Credit Usage ───────╮
+│ Plan:      Professional    │
+│ Credits:   1,250 / 5,000   │
+│            remaining        │
+│ Resets:    2026-04-01      │
+╰────────────────────────────╯
+
+       Breakdown
+┌──────────────┬──────────┐
+│ Action       │  Credits │
+├──────────────┼──────────┤
+│ Audit Run    │      450 │
+│ Optimize Run │      300 │
+│ Tone Extract │      200 │
+│ Llms Txt     │       50 │
+└──────────────┴──────────┘
+```
+
+## JSON output
+
+For automation and scripting, use the `--json` flag to get machine-readable output:
+
+```bash
+stobo credits --json
+```
+
+**Example JSON response:**
+
+```json
+{
+  "plan": "professional",
+  "remaining": 1250,
+  "total": 5000,
+  "reset_date": "2026-04-01",
+  "breakdown": {
+    "audit_run": 450,
+    "optimize_run": 300,
+    "tone_extract": 200,
+    "llms_txt": 50
+  }
+}
+```
+
+See the [JSON output guide](/guides/json-output) for more details on using JSON mode.
+
+## Credit tracking
+
+After running paid operations (audits, optimizations, etc.), Stobo displays a one-line credit summary:
+
+```
+Credits: 1,200 / 5,000 remaining | Resets 2026-04-01
+```
+
+<Tip>
+Run `stobo credits` anytime to check your balance before running credit-consuming operations.
+</Tip>
+
+## Error handling
+
+**Authentication error:**
+
+If you're not logged in or your API key is invalid, you'll see:
+
+```
+╭─────── Authentication Error ───────╮
+│ Your API key is invalid or         │
+│ expired.                            │
+│ Get a new one at trystobo.com      │
+│ Then run: stobo auth login         │
+╰────────────────────────────────────╯
+```
+
+**Insufficient credits:**
+
+When attempting operations without enough credits:
+
+```
+╭─────── Insufficient Credits ───────╮
+│ You've run out of credits.         │
+│ Top up at trystobo.com to continue │
+│ using premium tools.               │
+╰────────────────────────────────────╯
+```
+
+## Related commands
+
+- [auth](/commands/auth) - Manage API key authentication
+- [audit](/commands/audit) - Run SEO/AEO audits (consumes credits)
+- [optimize](/commands/optimize) - Optimize content (consumes credits)

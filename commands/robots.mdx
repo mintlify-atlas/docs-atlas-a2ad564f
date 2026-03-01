@@ -1,0 +1,54 @@
+---
+title: Robots commands
+description: Generate AI-crawler-optimized robots.txt files
+---
+
+The `stobo robots` command generates optimized `robots.txt` files that are specifically configured for AI crawlers while respecting traditional search engine bots.
+
+## stobo robots generate
+
+Generate an AI-crawler-optimized robots.txt file for a website.
+
+```bash
+stobo robots generate <url> [OPTIONS]
+```
+
+<ParamField path="url" type="string" required>
+  Website URL to generate robots.txt for
+</ParamField>
+
+### Options
+
+<ParamField path="--output" type="string">
+  Save the generated robots.txt to a file
+  
+  **Alias:** `-o`
+</ParamField>
+
+### Examples
+
+Generate a robots.txt file:
+
+```bash
+stobo robots generate https://example.com
+```
+
+Generate and save to file:
+
+```bash
+stobo robots generate https://example.com --output robots.txt
+```
+
+Generate and save to public directory:
+
+```bash
+stobo robots generate https://example.com -o public/robots.txt
+```
+
+<Info>
+  The generated robots.txt file is optimized for modern AI crawlers while maintaining compatibility with traditional search engine bots.
+</Info>
+
+<Tip>
+  Review the generated robots.txt file before deploying it to production to ensure it aligns with your crawling preferences.
+</Tip>

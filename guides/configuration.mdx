@@ -1,0 +1,301 @@
+---
+title: Configuration
+description: Configure Stobo CLI with environment variables, config files, and command-line options
+---
+
+Stobo CLI can be configured through environment variables, a configuration file, or command-line flags, with a clear priority order.
+
+## Configuration priority
+
+Configuration values are resolved in the following order (highest to lowest priority):
+
+1. **Command-line flags** - `--api-key`, `--base-url`, `--json`
+2. **Environment variables** - `STOBO_API_KEY`, `STOBO_BASE_URL`
+3. **Config file** - `~/.stobo/config.json`
+4. **Default values**
+
+## API key configuration
+
+### Method 1: Login command (recommended)
+
+The easiest way to configure your API key:
+
+<Steps>
+  <Step title="Get your API key">
+    Sign up at [trystobo.com](https://trystobo.com) and get your API key (starts with `sk_`).
+  </Step>
+  
+  <Step title="Run login command">
+    ```bash
+    stobo auth login
+    ```
+    
+    Enter your API key when prompted. It will be securely stored in `~/.stobo/config.json`.
+  </Step>
+  
+  <Step title="Verify authentication">
+    ```bash
+    stobo auth status
+    ```
+    
+    This confirms your API key is valid and shows your account details.
+  </Step>
+</Steps>
+
+### Method 2: Environment variable
+
+Set the `STOBO_API_KEY` environment variable:
+
+```bash
+export STOBO_API_KEY=sk_...
+```
+
+Add to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) to persist:
+
+```bash
+echo 'export STOBO_API_KEY=sk_...' >> ~/.zshrc
+```
+
+<Warning>
+Be careful not to commit your API key to version control when using environment variables in scripts.
+</Warning>
+
+### Method 3: Command-line flag
+
+Pass the API key with each command:
+
+```bash
+stobo --api-key sk_... audit run https://example.com
+```
+
+<Note>
+This method is useful for testing or one-off commands but not recommended for regular use.
+</Note>
+
+## Config file
+
+The configuration file is located at `~/.stobo/config.json`.
+
+### File structure
+
+```json
+{
+  "api_key": "sk_...",
+  "base_url": "https://api.trystobo.com"
+}
+```
+
+### File permissions
+
+The config file is created with `600` permissions (owner read/write only) for security:
+
+```bash
+-rw------- 1 user user 85 Mar 01 12:00 /home/user/.stobo/config.json
+```
+
+### Manual editing
+
+You can manually edit the config file:
+
+```bash
+vim ~/.stobo/config.json
+```
+
+Or clear it completely:
+
+```bash
+stobo auth logout
+# or
+rm ~/.stobo/config.json
+```
+
+## Environment variables
+
+### STOBO_API_KEY
+
+Your Stobo API key.
+
+```bash
+export STOBO_API_KEY=sk_...
+```
+
+**Priority:** Environment variable takes precedence over config file.
+
+### STOBO_BASE_URL
+
+Custom API endpoint (for self-hosted or development environments).
+
+```bash
+export STOBO_BASE_URL=https://api.custom.com
+```
+
+**Default:** `https://api.trystobo.com`
+
+**Priority:** Environment variable takes precedence over config file.
+
+## Command-line options
+
+### Global flags
+
+These flags work with all commands and must appear **before** the command name:
+
+```bash
+stobo [GLOBAL_FLAGS] <command> [COMMAND_FLAGS]
+```
+
+#### --api-key
+
+Specify API key for this command only:
+
+```bash
+stobo --api-key sk_... credits
+```
+
+#### --base-url
+
+Specify custom API endpoint:
+
+```bash
+stobo --base-url https://api.custom.com audit run $URL
+```
+
+#### --json
+
+Output raw JSON instead of formatted output:
+
+```bash
+stobo --json credits
+```
+
+See the [JSON output guide](/guides/json-output) for details.
+
+#### --version
+
+Show version and exit:
+
+```bash
+stobo --version
+# Output: stobo 0.3.7
+```
+
+## Configuration examples
+
+### Development environment
+
+Use environment variables in `.env` file:
+
+```bash
+# .env
+STOBO_API_KEY=sk_dev_...
+STOBO_BASE_URL=http://localhost:8000
+```
+
+Load with your development tools:
+
+```bash
+source .env
+stobo audit run https://staging.example.com
+```
+
+### CI/CD pipeline
+
+Use secrets management:
+
+```yaml
+# .github/workflows/seo-audit.yml
+name: SEO Audit
+
+on: [push]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run SEO audit
+        env:
+          STOBO_API_KEY: ${{ secrets.STOBO_API_KEY }}
+        run: |
+          pip install stobo-cli
+          stobo --json audit run ${{ github.event.head_commit.url }}
+```
+
+### Multiple environments
+
+Switch between production and staging:
+
+```bash
+# Production
+export STOBO_API_KEY=sk_prod_...
+stobo audit run https://example.com
+
+# Staging with different key
+stobo --api-key sk_staging_... audit run https://staging.example.com
+```
+
+### Docker container
+
+Pass environment variables:
+
+```bash
+docker run -e STOBO_API_KEY=sk_... stobo-cli credits
+```
+
+## Security best practices
+
+<Warning>
+**Never commit API keys to version control.**
+
+Add config files to `.gitignore`:
+
+```
+.env
+.stobo/
+```
+</Warning>
+
+<Tip>
+**Use different API keys for different environments** (development, staging, production).
+</Tip>
+
+<Tip>
+**Rotate API keys regularly** and revoke unused keys at [trystobo.com](https://trystobo.com).
+</Tip>
+
+## Troubleshooting
+
+### Check current configuration
+
+Verify which API key is being used:
+
+```bash
+stobo auth status
+```
+
+This shows the currently active key and validates it.
+
+### Check config file location
+
+```bash
+cat ~/.stobo/config.json
+```
+
+### Check environment variables
+
+```bash
+echo $STOBO_API_KEY
+echo $STOBO_BASE_URL
+```
+
+### Test with different configuration
+
+Override with command-line flag:
+
+```bash
+stobo --api-key sk_test_... auth status
+```
+
+## Related
+
+- [auth](/commands/auth) - Manage API key authentication
+- [JSON output](/guides/json-output) - Use JSON mode for automation
+- [Troubleshooting](/guides/troubleshooting) - Common issues and solutions

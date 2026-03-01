@@ -1,0 +1,116 @@
+---
+title: auth
+description: Manage API key authentication
+---
+
+The `auth` command group manages your Stobo API key authentication. It provides commands to log in, log out, and check your authentication status.
+
+## Commands
+
+### login
+
+Save and validate an API key.
+
+```bash
+stobo auth login
+```
+
+**Options:**
+
+- `--api-key, -k` - Your Stobo API key (sk_...)
+
+If you don't provide the `--api-key` flag, you'll be prompted to enter it securely (input will be hidden).
+
+**Example:**
+
+```bash
+# Interactive login (recommended)
+stobo auth login
+
+# Login with API key flag
+stobo auth login --api-key sk_...
+```
+
+**What happens:**
+
+1. Validates the API key against the Stobo API
+2. Saves the key to `~/.stobo/config.json` (with 600 permissions)
+3. Displays your account email on success
+
+**Example output:**
+
+```
+✓ Logged in as user@example.com
+```
+
+<Tip>
+Get your free API key at [trystobo.com](https://trystobo.com)
+</Tip>
+
+### logout
+
+Clear stored API key.
+
+```bash
+stobo auth logout
+```
+
+This removes your API key from `~/.stobo/config.json`. You'll need to log in again to use authenticated commands.
+
+**Example output:**
+
+```
+✓ Logged out. API key removed.
+```
+
+### status
+
+Show current authentication status.
+
+```bash
+stobo auth status
+```
+
+Displays your current authentication status, including your email, name, and a preview of your API key.
+
+**Example output:**
+
+```
+✓ Authenticated
+  Email: user@example.com
+  Name:  John Doe
+  Key:   sk_abc123...
+```
+
+If not logged in:
+
+```
+Not logged in. Run stobo auth login
+```
+
+<Note>
+The `status` command makes an API call to validate your key. If your stored key is invalid, you'll see an error message.
+</Note>
+
+## Global options
+
+The auth commands respect the global `--base-url` flag if you need to connect to a different API endpoint:
+
+```bash
+stobo --base-url https://custom-api.example.com auth login
+```
+
+## Configuration file
+
+API keys are stored in `~/.stobo/config.json` with restricted file permissions (600 - owner-only read/write).
+
+**Example config.json:**
+
+```json
+{
+  "api_key": "sk_...",
+  "base_url": "https://api.trystobo.com"
+}
+```
+
+See the [Configuration guide](/guides/configuration) for more details on configuration options.

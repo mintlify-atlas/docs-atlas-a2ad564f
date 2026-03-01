@@ -1,0 +1,221 @@
+---
+title: Audit commands
+description: Complete reference for all audit subcommands
+---
+
+The `audit` command group runs SEO and AEO audits on individual articles or entire websites.
+
+## stobo audit run
+
+Run a comprehensive audit on a single URL. By default, performs both SEO and AEO checks.
+
+```bash
+stobo audit run <url> [options]
+```
+
+### Arguments
+
+<ParamField path="url" type="string" required>
+  URL to audit. Automatically prepends `https://` if no scheme is provided.
+</ParamField>
+
+### Options
+
+<ParamField path="--seo-only" type="boolean" default={false}>
+  Run only SEO checks, skipping AEO analysis.
+</ParamField>
+
+<ParamField path="--aeo-only" type="boolean" default={false}>
+  Run only AEO checks, skipping SEO analysis.
+</ParamField>
+
+<ParamField path="--keyword" type="string">
+  Target keyword for SEO optimization analysis. Used for keyword density, relevance scoring, and ranking potential.
+  
+  **Alias:** `-k`
+</ParamField>
+
+<ParamField path="--playwright" type="boolean" default={false}>
+  Force Playwright browser rendering for JavaScript-heavy single-page applications (SPAs). Useful when standard HTTP fetching returns incomplete content.
+</ParamField>
+
+### Response fields
+
+Returns a JSON object containing:
+
+- `audit_id` (string) - Unique UUID for this audit
+- `url` (string) - Audited URL
+- `seo` (object) - SEO analysis results (if included)
+- `aeo` (object) - AEO analysis results (if included)
+- `keyword` (string) - Target keyword used (if provided)
+- `created_at` (string) - ISO 8601 timestamp
+
+### Examples
+
+<CodeGroup>
+```bash Full audit
+stobo audit run https://example.com/blog/post
+```
+
+```bash SEO only with keyword
+stobo audit run example.com/article --seo-only --keyword "AI tools"
+```
+
+```bash AEO only
+stobo audit run https://docs.example.com --aeo-only
+```
+
+```bash Force JavaScript rendering
+stobo audit run https://react-app.com --playwright
+```
+
+```bash JSON output
+stobo audit run https://example.com --json
+```
+</CodeGroup>
+
+---
+
+## stobo audit site
+
+Run a comprehensive site-wide audit including SEO, AEO, blog detection, and sitemap discovery.
+
+```bash
+stobo audit site <url>
+```
+
+### Arguments
+
+<ParamField path="url" type="string" required>
+  Website root URL to audit.
+</ParamField>
+
+### Response fields
+
+Returns a JSON object containing:
+
+- `site_audit_id` (string) - Unique UUID for this site audit
+- `url` (string) - Audited site URL
+- `seo` (object) - Site-wide SEO metrics
+- `aeo` (object) - Site-wide AEO metrics
+- `blog_detected` (boolean) - Whether a blog was detected
+- `blog_url` (string) - Discovered blog URL (if detected)
+- `sitemaps` (array) - Discovered sitemap URLs
+- `created_at` (string) - ISO 8601 timestamp
+
+### Examples
+
+<CodeGroup>
+```bash Basic site audit
+stobo audit site https://example.com
+```
+
+```bash JSON output
+stobo audit site example.com --json
+```
+</CodeGroup>
+
+---
+
+## stobo audit get
+
+Retrieve a specific audit by its UUID.
+
+```bash
+stobo audit get <audit_id>
+```
+
+### Arguments
+
+<ParamField path="audit_id" type="string" required>
+  Audit UUID returned from a previous `audit run` command.
+</ParamField>
+
+### Examples
+
+```bash
+stobo audit get a3b2c1d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+```
+
+---
+
+## stobo audit get-url
+
+Retrieve the most recent audit for a specific URL.
+
+```bash
+stobo audit get-url <url>
+```
+
+### Arguments
+
+<ParamField path="url" type="string" required>
+  URL to look up in audit history.
+</ParamField>
+
+### Examples
+
+```bash
+stobo audit get-url https://example.com/blog/post
+```
+
+---
+
+## stobo audit list
+
+List recent audits with pagination support.
+
+```bash
+stobo audit list [options]
+```
+
+### Options
+
+<ParamField path="--limit" type="integer" default={20}>
+  Maximum number of results to return (1-100).
+  
+  **Alias:** `-n`
+</ParamField>
+
+### Response fields
+
+Returns an array of audit objects, each containing:
+
+- `audit_id` (string)
+- `url` (string)
+- `created_at` (string)
+- `status` (string)
+
+### Examples
+
+<CodeGroup>
+```bash Default list
+stobo audit list
+```
+
+```bash List 50 audits
+stobo audit list --limit 50
+```
+
+```bash Short form
+stobo audit list -n 10
+```
+</CodeGroup>
+
+---
+
+## Status codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 400 | Invalid URL or parameters |
+| 401 | Missing or invalid API key |
+| 404 | Audit not found |
+| 429 | Rate limit exceeded |
+| 500 | Server error |
+
+## Related commands
+
+- [optimize commands](/api/optimize-commands) - Run full optimization pipeline after auditing
+- [export commands](/api/export-commands) - Export audit results to markdown

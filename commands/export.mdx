@@ -1,0 +1,103 @@
+---
+title: Export commands
+description: Generate markdown reports from Stobo analysis data
+---
+
+The `stobo export` commands generate markdown reports from your Stobo analysis data. You can create brand voice guidelines, SEO audit reports, and article rewrites.
+
+## stobo export run
+
+Generate a markdown export report for a customer.
+
+```bash
+stobo export run <customer_id> <data_type> [OPTIONS]
+```
+
+<ParamField path="customer_id" type="string" required>
+  Customer ID to generate the report for
+</ParamField>
+
+<ParamField path="data_type" type="string" required>
+  Type of export to generate. Must be one of:
+  - `brand_voice` - Brand voice guidelines
+  - `seo_audit` - SEO audit report
+  - `article_rewrite` - Article rewrite report
+</ParamField>
+
+### Options
+
+<ParamField path="--output" type="string">
+  Save the report to a file instead of displaying it
+  
+  **Alias:** `-o`
+</ParamField>
+
+<ParamField path="--force" type="boolean">
+  Regenerate the report even if a cached version exists
+</ParamField>
+
+### Examples
+
+Generate a brand voice export:
+
+```bash
+stobo export run cust_abc123 brand_voice
+```
+
+Generate an SEO audit report and save to file:
+
+```bash
+stobo export run cust_abc123 seo_audit --output report.md
+```
+
+Force regenerate an article rewrite:
+
+```bash
+stobo export run cust_abc123 article_rewrite --force
+```
+
+<Note>
+  Brand voice exports automatically fetch tone data if not already cached.
+</Note>
+
+## stobo export get
+
+Retrieve a cached export report without regenerating it.
+
+```bash
+stobo export get <customer_id> <data_type> [OPTIONS]
+```
+
+<ParamField path="customer_id" type="string" required>
+  Customer ID to retrieve the report for
+</ParamField>
+
+<ParamField path="data_type" type="string" required>
+  Type of export to retrieve: `brand_voice`, `seo_audit`, or `article_rewrite`
+</ParamField>
+
+### Options
+
+<ParamField path="--output" type="string">
+  Save the report to a file instead of displaying it
+  
+  **Alias:** `-o`
+</ParamField>
+
+### Examples
+
+Get a cached brand voice export:
+
+```bash
+stobo export get cust_abc123 brand_voice
+```
+
+Get a cached SEO audit and save to file:
+
+```bash
+stobo export get cust_abc123 seo_audit -o audit-report.md
+```
+
+<Info>
+  Use `export get` to retrieve previously generated reports without consuming additional credits.
+</Info>

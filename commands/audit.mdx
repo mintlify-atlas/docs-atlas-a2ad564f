@@ -1,0 +1,259 @@
+---
+title: stobo audit
+description: Run and manage SEO/AEO audits on URLs and websites
+---
+
+## Overview
+
+The `stobo audit` command runs comprehensive SEO and AEO (Answer Engine Optimization) audits on individual URLs or entire websites. Get actionable insights about search engine visibility and AI readiness.
+
+## Commands
+
+### stobo audit run
+
+Run an audit on a specific URL.
+
+```bash
+stobo audit run <url> [options]
+```
+
+<ParamField path="url" type="string" required>
+  URL to audit
+</ParamField>
+
+<ParamField path="--seo-only" type="boolean" default="false">
+  Run only SEO checks, skip AEO analysis
+</ParamField>
+
+<ParamField path="--aeo-only" type="boolean" default="false">
+  Run only AEO checks, skip SEO analysis
+</ParamField>
+
+<ParamField path="--keyword" type="string">
+  Target keyword for SEO analysis. Alias: `-k`
+</ParamField>
+
+<ParamField path="--playwright" type="boolean" default="false">
+  Force Playwright for JavaScript-rendered SPAs
+</ParamField>
+
+#### Example
+
+```bash
+# Full audit (SEO + AEO)
+stobo audit run https://example.com/article
+
+# SEO-only audit with target keyword
+stobo audit run https://example.com/article --seo-only --keyword "AI optimization"
+
+# AEO-only audit
+stobo audit run https://example.com/article --aeo-only
+
+# Audit JavaScript-heavy SPA
+stobo audit run https://app.example.com --playwright
+```
+
+<Info>
+  **Credit cost:** SEO-only and AEO-only audits consume fewer credits than combined audits.
+</Info>
+
+#### Output
+
+```
+╭─────────────────────────────────────────────────────────────╮
+│ Audit Result                                                │
+├─────────────────────────────────────────────────────────────┤
+│ A  87%  —  https://example.com/article                     │
+╰─────────────────────────────────────────────────────────────╯
+
+                    Category Scores
+┌──────────────────────┬────────┐
+│ Category             │  Score │
+├──────────────────────┼────────┤
+│ Content Quality      │     45 │
+│ Technical SEO        │     38 │
+│ User Experience      │     42 │
+└──────────────────────┴────────┘
+
+Top Issues (3):
+  • Missing meta description
+  • H1 tag should be more descriptive
+  • Add FAQ schema markup for better AI visibility
+```
+
+---
+
+### stobo audit site
+
+Run a comprehensive site audit including SEO, AEO, blog detection, and sitemap discovery.
+
+```bash
+stobo audit site <url>
+```
+
+<ParamField path="url" type="string" required>
+  Website URL to audit (homepage)
+</ParamField>
+
+#### Example
+
+```bash
+stobo audit site https://example.com
+```
+
+<Info>
+  **Site audits** analyze your entire domain, detecting blog sections, discovering sitemaps, and providing site-wide recommendations.
+</Info>
+
+#### Output
+
+```
+╭─────────────────────────────────────────────────────────────╮
+│ Site Audit                                                  │
+├─────────────────────────────────────────────────────────────┤
+│ example.com                                                 │
+│ B  82.5%  (SEO + AEO combined)                             │
+╰─────────────────────────────────────────────────────────────╯
+
+SEO Audit — B (312/380 points)
+┌──────────────────────┬───────────┬──────────────────────────┐
+│ Category             │     Score │                          │
+├──────────────────────┼───────────┼──────────────────────────┤
+│ Content              │    85/100 │ ████████████████████ 85% │
+│ Technical            │    72/90  │ ████████████████░░░░ 80% │
+│ User Experience      │    95/110 │ ███████████████████░ 86% │
+│ Metadata             │    60/80  │ ███████████████░░░░░ 75% │
+└──────────────────────┴───────────┴──────────────────────────┘
+
+AEO Audit — A (121/135 points, 90%)
+┌──────────────────────┬───────────┬──────────────────────┬─────────────────┐
+│ Check                │     Score │ Status               │ Message         │
+├──────────────────────┼───────────┼──────────────────────┼─────────────────┤
+│ ✓ AI Crawler Access  │     25/25 │ Excellent            │ All bots allow… │
+│ ✓ llms.txt           │     20/20 │ Excellent            │ Found and well… │
+│ ✓ Content Freshness  │     20/20 │ Excellent            │ Schema present  │
+│ ✓ Visible FAQ        │     15/15 │ Good                 │ FAQ detected    │
+│ ✓ FAQ Schema Markup  │     20/20 │ Excellent            │ Valid schema    │
+│ ~ Direct Answer      │      6/10 │ Needs Improvement    │ Could be clear… │
+│ ✓ Sitemap            │     15/15 │ Excellent            │ Found at /site… │
+└──────────────────────┴───────────┴──────────────────────┴─────────────────┘
+
+Blog Detection
+  ✓ Blog found at https://example.com/blog
+  24 articles discovered
+  Sitemap: https://example.com/blog-sitemap.xml
+
+  Next steps:
+  • stobo freshness run https://example.com/blog-sitemap.xml
+  • stobo audit run <article-url>
+
+Top Recommendations (5/12):
+  • Add structured data for Organization [schema]
+  • Improve mobile performance score [performance]
+  • Add breadcrumb navigation [navigation]
+```
+
+---
+
+### stobo audit list
+
+List your recent audits.
+
+```bash
+stobo audit list [options]
+```
+
+<ParamField path="--limit" type="integer" default="20">
+  Maximum number of results to return. Alias: `-n`
+</ParamField>
+
+#### Example
+
+```bash
+# List last 20 audits
+stobo audit list
+
+# List last 50 audits
+stobo audit list --limit 50
+```
+
+#### Output
+
+```
+                          Recent Audits
+┌──────────┬───────────────────────────────────┬───────┬───────┬────────────┐
+│ ID       │ URL                               │ Grade │ Score │ Date       │
+├──────────┼───────────────────────────────────┼───────┼───────┼────────────┤
+│ a1b2c3d4 │ https://example.com/article-1     │ A     │  92%  │ 2026-03-01 │
+│ e5f6g7h8 │ https://example.com/article-2     │ B     │  84%  │ 2026-02-28 │
+│ i9j0k1l2 │ https://example.com               │ B     │  82%  │ 2026-02-27 │
+└──────────┴───────────────────────────────────┴───────┴───────┴────────────┘
+```
+
+---
+
+### stobo audit get
+
+Retrieve a specific audit by its ID.
+
+```bash
+stobo audit get <audit_id>
+```
+
+<ParamField path="audit_id" type="string" required>
+  Audit UUID to retrieve
+</ParamField>
+
+#### Example
+
+```bash
+stobo audit get a1b2c3d4-5678-90ab-cdef-1234567890ab
+```
+
+---
+
+### stobo audit get-url
+
+Get the most recent audit for a specific URL.
+
+```bash
+stobo audit get-url <url>
+```
+
+<ParamField path="url" type="string" required>
+  URL to look up
+</ParamField>
+
+#### Example
+
+```bash
+stobo audit get-url https://example.com/article
+```
+
+<Note>
+  This command returns the **most recent audit** for the specified URL. If you need a specific audit, use `stobo audit get` with the audit ID.
+</Note>
+
+---
+
+## Understanding grades
+
+Audits are scored on a percentage scale and assigned letter grades:
+
+- **A** (91-100%): Excellent optimization
+- **B** (76-90%): Good, minor improvements needed
+- **C** (51-75%): Fair, several issues to address
+- **D** (26-50%): Poor, major optimization required
+- **F** (0-25%): Critical issues
+
+---
+
+## JSON output
+
+All audit commands support JSON output using the global `--json` flag:
+
+```bash
+stobo audit run https://example.com --json
+```
+
+This returns structured data suitable for automation and integration.

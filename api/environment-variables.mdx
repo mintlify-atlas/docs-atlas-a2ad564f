@@ -1,0 +1,241 @@
+---
+title: Environment variables
+description: Document STOBO_API_KEY and other environment variables
+---
+
+Stobo CLI supports environment variables for configuration without command-line flags.
+
+## STOBO_API_KEY
+
+Set the API key for all Stobo CLI commands.
+
+<ParamField path="STOBO_API_KEY" type="string">
+  Your Stobo API key (starts with `sk_`). Takes precedence over `~/.stobo/config.json` but is overridden by `--api-key` flag.
+</ParamField>
+
+### Priority order
+
+1. `--api-key` flag (highest)
+2. `STOBO_API_KEY` environment variable
+3. `~/.stobo/config.json` file (lowest)
+
+### Examples
+
+<CodeGroup>
+```bash Shell export
+export STOBO_API_KEY=sk_test_abc123
+stobo audit run https://example.com
+```
+
+```bash Inline (bash)
+STOBO_API_KEY=sk_test_abc123 stobo audit run example.com
+```
+
+```bash PowerShell
+$env:STOBO_API_KEY="sk_test_abc123"
+stobo audit run example.com
+```
+
+```bash .env file (with direnv)
+# .env
+STOBO_API_KEY=sk_test_abc123
+```
+</CodeGroup>
+
+---
+
+## STOBO_BASE_URL
+
+Set a custom API base URL for all commands.
+
+<ParamField path="STOBO_BASE_URL" type="string" default="https://api.trystobo.com">
+  API base URL. Useful for staging environments or self-hosted instances.
+</ParamField>
+
+### Priority order
+
+1. `--base-url` flag (highest)
+2. `STOBO_BASE_URL` environment variable
+3. `~/.stobo/config.json` file
+4. Default: `https://api.trystobo.com` (lowest)
+
+### Examples
+
+<CodeGroup>
+```bash Shell export
+export STOBO_BASE_URL=https://staging-api.trystobo.com
+stobo audit run example.com
+```
+
+```bash Inline
+STOBO_BASE_URL=http://localhost:8000 stobo audit run example.com
+```
+
+```bash Combined with API key
+export STOBO_API_KEY=sk_test_abc123
+export STOBO_BASE_URL=https://custom.api.com
+stobo audit run example.com
+```
+</CodeGroup>
+
+---
+
+## Configuration file reference
+
+Environment variables map to the `~/.stobo/config.json` configuration file:
+
+### Mapping
+
+| Environment Variable | Config File Key | Description |
+|---------------------|-----------------|-------------|
+| `STOBO_API_KEY` | `api_key` | API authentication key |
+| `STOBO_BASE_URL` | `base_url` | API endpoint URL |
+
+### File location
+
+```
+~/.stobo/config.json
+```
+
+### Example structure
+
+```json
+{
+  "api_key": "sk_test_abc123",
+  "base_url": "https://api.trystobo.com"
+}
+```
+
+---
+
+## MCP server environment variables
+
+When installing the Stobo MCP server, these environment variables are configured automatically:
+
+### STOBO_API_KEY (MCP)
+
+Configured in Claude Desktop and Cursor MCP settings to authenticate MCP tool calls.
+
+### STOBO_BASE_URL (MCP)
+
+Always set to `https://api.trystobo.com` in MCP server configuration.
+
+### Configuration file snippet
+
+```json
+{
+  "mcpServers": {
+    "stobo": {
+      "command": "stobo-mcp",
+      "env": {
+        "STOBO_API_KEY": "sk_test_abc123",
+        "STOBO_BASE_URL": "https://api.trystobo.com"
+      }
+    }
+  }
+}
+```
+
+---
+
+## Best practices
+
+### Security
+
+<Warning>
+Never commit API keys to version control. Use environment variables or config files with proper `.gitignore` rules.
+</Warning>
+
+<CodeGroup>
+```bash .gitignore
+# Ignore Stobo config
+.stobo/
+.env
+```
+
+```bash .env.example
+# Copy to .env and fill in your keys
+STOBO_API_KEY=sk_your_key_here
+STOBO_BASE_URL=https://api.trystobo.com
+```
+</CodeGroup>
+
+### Development vs. production
+
+<CodeGroup>
+```bash Development
+export STOBO_API_KEY=sk_test_abc123
+export STOBO_BASE_URL=https://staging-api.trystobo.com
+```
+
+```bash Production
+export STOBO_API_KEY=sk_live_xyz789
+export STOBO_BASE_URL=https://api.trystobo.com
+```
+</CodeGroup>
+
+### CI/CD pipelines
+
+Store secrets in your CI/CD platform's secret management:
+
+<CodeGroup>
+```yaml GitHub Actions
+- name: Run Stobo audit
+  env:
+    STOBO_API_KEY: ${{ secrets.STOBO_API_KEY }}
+  run: stobo audit run https://example.com --json
+```
+
+```yaml GitLab CI
+audit:
+  script:
+    - stobo audit run https://example.com --json
+  variables:
+    STOBO_API_KEY: $STOBO_API_KEY
+```
+
+```groovy Jenkins
+withCredentials([string(credentialsId: 'stobo-api-key', variable: 'STOBO_API_KEY')]) {
+  sh 'stobo audit run https://example.com --json'
+}
+```
+</CodeGroup>
+
+---
+
+## Troubleshooting
+
+### Verify environment variables
+
+<CodeGroup>
+```bash bash/zsh
+echo $STOBO_API_KEY
+echo $STOBO_BASE_URL
+```
+
+```bash PowerShell
+echo $env:STOBO_API_KEY
+echo $env:STOBO_BASE_URL
+```
+
+```bash Check authentication
+stobo auth status
+```
+</CodeGroup>
+
+### Override for testing
+
+```bash
+# Temporarily override
+STOBO_API_KEY=sk_test_override stobo audit run example.com
+
+# Check which key is being used
+stobo auth status
+```
+
+---
+
+## Related topics
+
+- [global options](/api/global-options) - Command-line flags
+- [auth commands](/api/auth-commands) - Manage stored credentials

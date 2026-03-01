@@ -1,80 +1,197 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart
+description: Run your first SEO and AEO audit with Stobo CLI in under a minute.
 ---
 
-## Get started in three steps
+## Run your first audit
 
-Get your documentation site running locally and make your first customization.
+Get started immediately with a free audit—no API key required.
 
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+<Steps>
+  <Step title="Install Stobo CLI">
+    If you haven't already, install Stobo CLI using pip:
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+    ```bash
+    pip install stobo
+    ```
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+    <Info>
+      See the [installation guide](/installation) for alternative installation methods and troubleshooting.
+    </Info>
+  </Step>
+  
+  <Step title="Run a site audit">
+    Audit an entire website with a single command:
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    ```bash
+    stobo audit site https://example.com
+    ```
+    
+    This command runs:
+    - 30+ SEO checks (meta tags, headings, structured data, performance)
+    - 7 AEO checks (answer engine optimization)
+    - Blog detection
+    - Sitemap discovery
+    
+    <Tip>
+      Site audits are completely free and require no authentication.
+    </Tip>
+  </Step>
+  
+  <Step title="Audit a specific article">
+    For article-level analysis, use the `audit run` command:
+    
+    ```bash
+    stobo audit run https://example.com/blog/my-post
+    ```
+    
+    This performs both SEO and AEO checks on the specific URL.
+    
+    **Filter by check type:**
+    
+    <CodeGroup>
+    ```bash SEO only
+    stobo audit run https://example.com/blog/my-post --seo-only
+    ```
+    
+    ```bash AEO only
+    stobo audit run https://example.com/blog/my-post --aeo-only
+    ```
+    
+    ```bash With target keyword
+    stobo audit run https://example.com/blog/my-post --keyword "content optimization"
+    ```
+    </CodeGroup>
+  </Step>
+  
+  <Step title="View your results">
+    Stobo CLI displays rich, color-coded results directly in your terminal:
+    
+    - ✓ **Passed checks** in green
+    - ✗ **Failed checks** in red with recommendations
+    - **Categorized results** by SEO area (content, technical, meta, etc.)
+    - **Actionable suggestions** for each issue
+    
+    <Info>
+      Want machine-readable output? Add the `--json` flag to any command:
+      
+      ```bash
+      stobo audit site https://example.com --json
+      ```
+    </Info>
+  </Step>
+</Steps>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+## Understanding audit results
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+### Site audit output
 
-### Step 3: Go live
+A site audit provides:
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+- **SEO categories**: Content, technical, meta tags, structured data, performance
+- **AEO checklist**: Answer engine optimization factors
+- **Blog detection**: Identifies blog sections and content patterns
+- **Sitemap discovery**: Finds and validates XML sitemaps
+- **Recommendations**: Prioritized action items
 
-## Next steps
+### Article audit output
 
-Now that you have your docs running, explore these key features:
+An article audit includes:
 
-<CardGroup cols={2}>
+- **SEO score**: Overall optimization rating
+- **Individual checks**: Title, meta description, headings, images, internal links
+- **AEO analysis**: Answer potential, entity coverage, structured snippets
+- **Keyword optimization**: Target keyword usage and density (if specified)
 
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
+## Common commands
 
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
+Here are essential commands to get you started:
 
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
+<CodeGroup>
+```bash Site audit
+# Comprehensive website audit
+stobo audit site https://example.com
+```
 
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
+```bash Article audit
+# Single page/article audit
+stobo audit run https://example.com/blog/post
+```
 
-</CardGroup>
+```bash List audits
+# View your recent audits
+stobo audit list
+```
+
+```bash Get specific audit
+# Retrieve audit by ID
+stobo audit get <audit-id>
+```
+
+```bash Get by URL
+# Get most recent audit for a URL
+stobo audit get-url https://example.com/blog/post
+```
+</CodeGroup>
+
+## Global options
+
+You can use these flags with any command:
+
+| Option | Description | Example |
+|--------|-------------|----------|
+| `--json` | Output raw JSON | `stobo audit site https://example.com --json` |
+| `--api-key` | Override stored API key | `stobo --api-key sk_... audit site https://example.com` |
+| `--base-url` | Override API base URL | `stobo --base-url https://api.example.com ...` |
+| `--version` | Show version | `stobo --version` |
+| `--help` | Show help | `stobo --help` |
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  You can also set the API key via the `STOBO_API_KEY` environment variable instead of using the `--api-key` flag.
 </Note>
+
+## What's next?
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/authentication">
+    Set up your API key to unlock paid features like brand voice extraction and optimization
+  </Card>
+  
+  <Card title="Core features" icon="sparkles" href="/features/site-audits">
+    Explore advanced features: tone extraction, llms.txt generation, and full optimization pipelines
+  </Card>
+</CardGroup>
+
+<Tip>
+  **Pro tip**: Use the `--help` flag with any command to see all available options:
+  
+  ```bash
+  stobo audit run --help
+  ```
+</Tip>
+
+## Example workflow
+
+Here's a typical workflow for auditing and improving your content:
+
+```bash
+# 1. Audit your site
+stobo audit site https://yourblog.com
+
+# 2. Audit a specific article
+stobo audit run https://yourblog.com/blog/latest-post
+
+# 3. Authenticate for paid features (if needed)
+stobo auth login
+
+# 4. Extract your brand voice
+stobo tone extract https://yourblog.com/blog
+
+# 5. Run full optimization on an article
+stobo optimize run https://yourblog.com/blog/latest-post
+
+# 6. Check your credit balance
+stobo credits
+```
+
+You're now ready to start auditing and optimizing your content with Stobo CLI!

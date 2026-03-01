@@ -1,0 +1,426 @@
+---
+title: Troubleshooting
+description: Common issues and solutions for Stobo CLI
+---
+
+This guide covers common issues you might encounter when using Stobo CLI and how to resolve them.
+
+## Authentication issues
+
+<Accordion title="Not logged in / No API key configured">
+  **Error message:**
+  
+  ```
+  ╭─────── Authentication Error ───────╮
+  │ No API key configured.             │
+  │ Get your free API key at           │
+  │ https://trystobo.com               │
+  │ Then run: stobo auth login         │
+  ╰────────────────────────────────────╯
+  ```
+  
+  **Solution:**
+  
+  <Steps>
+    <Step title="Get an API key">
+      Sign up at [trystobo.com](https://trystobo.com) and copy your API key (starts with `sk_`).
+    </Step>
+    
+    <Step title="Log in">
+      ```bash
+      stobo auth login
+      ```
+      
+      Enter your API key when prompted.
+    </Step>
+    
+    <Step title="Verify">
+      ```bash
+      stobo auth status
+      ```
+    </Step>
+  </Steps>
+</Accordion>
+
+<Accordion title="Invalid or expired API key">
+  **Error message:**
+  
+  ```
+  ╭─────── Authentication Error ───────╮
+  │ Your API key is invalid or         │
+  │ expired.                            │
+  │ Get a new one at trystobo.com      │
+  │ Then run: stobo auth login         │
+  ╰────────────────────────────────────╯
+  ```
+  
+  **Solution:**
+  
+  1. Check if your API key was revoked at [trystobo.com](https://trystobo.com)
+  2. Generate a new API key if needed
+  3. Update your configuration:
+  
+  ```bash
+  stobo auth logout
+  stobo auth login
+  ```
+  
+  Or update the environment variable:
+  
+  ```bash
+  export STOBO_API_KEY=sk_new_key...
+  ```
+</Accordion>
+
+<Accordion title="Stored key is invalid">
+  **Error message:**
+  
+  ```
+  ✗ Stored key is invalid. Run stobo auth login
+  ```
+  
+  **Cause:** The API key in `~/.stobo/config.json` is no longer valid.
+  
+  **Solution:**
+  
+  ```bash
+  # Clear old configuration
+  stobo auth logout
+  
+  # Log in with new key
+  stobo auth login
+  ```
+</Accordion>
+
+## Credit issues
+
+<Accordion title="Insufficient credits">
+  **Error message:**
+  
+  ```
+  ╭─────── Insufficient Credits ───────╮
+  │ You've run out of credits.         │
+  │ Top up at trystobo.com to continue │
+  │ using premium tools.               │
+  ╰────────────────────────────────────╯
+  ```
+  
+  **Solution:**
+  
+  1. Check your current balance:
+  
+  ```bash
+  stobo credits
+  ```
+  
+  2. Top up your credits at [trystobo.com](https://trystobo.com)
+  
+  3. Credits reset monthly according to your plan's reset date
+</Accordion>
+
+<Accordion title="Rate limit reached">
+  **Error message:**
+  
+  ```
+  ╭─────── Rate Limited ───────╮
+  │ Rate limit reached. Please │
+  │ wait a moment and try      │
+  │ again.                     │
+  ╰────────────────────────────╯
+  ```
+  
+  **Cause:** Too many requests in a short time period.
+  
+  **Solution:**
+  
+  - Wait 60 seconds before retrying
+  - For batch operations, add delays between requests:
+  
+  ```bash
+  for url in $(cat urls.txt); do
+    stobo audit run $url
+    sleep 5  # Wait 5 seconds between requests
+  done
+  ```
+</Accordion>
+
+## Configuration issues
+
+<Accordion title="Config file permissions error">
+  **Cause:** Incorrect permissions on `~/.stobo/config.json`.
+  
+  **Solution:**
+  
+  Fix file permissions:
+  
+  ```bash
+  chmod 600 ~/.stobo/config.json
+  ```
+  
+  Or recreate the config:
+  
+  ```bash
+  rm ~/.stobo/config.json
+  stobo auth login
+  ```
+</Accordion>
+
+<Accordion title="API key not being used">
+  **Cause:** Configuration priority issue.
+  
+  **Check configuration priority:**
+  
+  1. Command-line flags (highest)
+  2. Environment variables
+  3. Config file
+  4. Default values (lowest)
+  
+  **Debug steps:**
+  
+  ```bash
+  # Check config file
+  cat ~/.stobo/config.json
+  
+  # Check environment variable
+  echo $STOBO_API_KEY
+  
+  # Verify which key is active
+  stobo auth status
+  ```
+  
+  **Solution:** Remove conflicting configuration sources:
+  
+  ```bash
+  # Unset environment variable
+  unset STOBO_API_KEY
+  
+  # Or clear config file
+  stobo auth logout
+  ```
+</Accordion>
+
+<Accordion title="Wrong API endpoint">
+  **Cause:** Custom `base_url` configured incorrectly.
+  
+  **Check current endpoint:**
+  
+  ```bash
+  cat ~/.stobo/config.json
+  echo $STOBO_BASE_URL
+  ```
+  
+  **Solution:**
+  
+  Reset to default endpoint:
+  
+  ```bash
+  # Remove custom base_url from config
+  stobo auth logout
+  stobo auth login
+  
+  # Or unset environment variable
+  unset STOBO_BASE_URL
+  ```
+  
+  The default endpoint is `https://api.trystobo.com`.
+</Accordion>
+
+## Command issues
+
+<Accordion title="JSON output not working">
+  **Problem:** `--json` flag not producing JSON output.
+  
+  **Common mistake:** Putting `--json` after the command name.
+  
+  **Incorrect:**
+  ```bash
+  stobo credits --json  # ✗ Wrong
+  ```
+  
+  **Correct:**
+  ```bash
+  stobo --json credits  # ✓ Correct
+  ```
+  
+  The `--json` flag is a global option and must come **before** the command name.
+</Accordion>
+
+<Accordion title="Command not found">
+  **Error message:**
+  
+  ```
+  stobo: command not found
+  ```
+  
+  **Solution:**
+  
+  1. Verify installation:
+  
+  ```bash
+  pip show stobo-cli
+  ```
+  
+  2. Reinstall if needed:
+  
+  ```bash
+  pip install --upgrade stobo-cli
+  ```
+  
+  3. Check PATH:
+  
+  ```bash
+  which stobo
+  echo $PATH
+  ```
+  
+  4. Try running with Python module:
+  
+  ```bash
+  python -m stobo --version
+  ```
+</Accordion>
+
+<Accordion title="Timeout errors">
+  **Error:** Command times out during audit or optimization.
+  
+  **Cause:** Large sites or slow networks.
+  
+  **Solution:**
+  
+  The CLI has a default timeout of 180 seconds. For large sites:
+  
+  - Break operations into smaller chunks
+  - Use async operations where available:
+  
+  ```bash
+  # Start async job
+  stobo optimize run $URL
+  
+  # Check status later
+  stobo optimize status <job-id>
+  ```
+</Accordion>
+
+## Network issues
+
+<Accordion title="Connection refused or timeout">
+  **Error:** Cannot connect to API endpoint.
+  
+  **Debug steps:**
+  
+  1. Check internet connectivity:
+  
+  ```bash
+  curl https://api.trystobo.com/health
+  ```
+  
+  2. Check DNS resolution:
+  
+  ```bash
+  nslookup api.trystobo.com
+  ```
+  
+  3. Check firewall/proxy settings
+  
+  4. Try with custom timeout:
+  
+  The client uses 180s timeout by default (source: client.py:92).
+</Accordion>
+
+<Accordion title="SSL certificate errors">
+  **Error:** SSL verification failed.
+  
+  **Cause:** Corporate proxy or firewall intercepting HTTPS.
+  
+  **Not recommended for production:** Contact your IT department to whitelist `api.trystobo.com`.
+</Accordion>
+
+## Output issues
+
+<Accordion title="Garbled output or encoding errors">
+  **Cause:** Terminal encoding issues.
+  
+  **Solution:**
+  
+  1. Set UTF-8 encoding:
+  
+  ```bash
+  export LC_ALL=en_US.UTF-8
+  export LANG=en_US.UTF-8
+  ```
+  
+  2. Use JSON output for scripting:
+  
+  ```bash
+  stobo --json audit run $URL | jq
+  ```
+</Accordion>
+
+<Accordion title="Color output in logs">
+  **Problem:** ANSI color codes appearing in CI/CD logs.
+  
+  **Solution:**
+  
+  Use `--json` for structured output in automated environments:
+  
+  ```bash
+  stobo --json credits > output.json
+  ```
+  
+  Or strip colors:
+  
+  ```bash
+  stobo credits | sed 's/\x1b\[[0-9;]*m//g'
+  ```
+</Accordion>
+
+## Getting help
+
+### Check version
+
+```bash
+stobo --version
+```
+
+Ensure you're running the latest version.
+
+### View command help
+
+All commands support `--help`:
+
+```bash
+stobo --help
+stobo audit --help
+stobo audit run --help
+```
+
+### Enable verbose output
+
+For debugging, use `--json` to see full API responses:
+
+```bash
+stobo --json audit run $URL | jq
+```
+
+### Check API status
+
+Verify the API is operational:
+
+```bash
+curl https://api.trystobo.com/health
+```
+
+### Contact support
+
+If issues persist:
+
+- Email: support@trystobo.com
+- Documentation: [trystobo.com/docs](https://trystobo.com/docs)
+- Report bugs on the GitHub repository
+
+## Related
+
+- [Configuration](/guides/configuration) - Configuration options and priority
+- [auth](/commands/auth) - Authentication commands
+- [credits](/commands/credits) - Check credit balance
+- [JSON output](/guides/json-output) - Using JSON mode

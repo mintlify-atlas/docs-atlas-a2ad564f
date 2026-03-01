@@ -1,0 +1,104 @@
+---
+title: LLMs commands
+description: Complete reference for all llms subcommands
+---
+
+The `llms` command group generates `llms.txt` files for AI discoverability according to the [llms.txt specification](https://llmstxt.org/).
+
+## stobo llms generate
+
+Generate a `llms.txt` file for a website to improve AI crawler discoverability.
+
+```bash
+stobo llms generate <url> [options]
+```
+
+### Arguments
+
+<ParamField path="url" type="string" required>
+  Website URL to generate llms.txt for. The CLI will crawl the site to discover structure and important pages.
+</ParamField>
+
+### Options
+
+<ParamField path="--output" type="string">
+  Save the generated llms.txt content to a file instead of printing to stdout.
+  
+  **Alias:** `-o`
+</ParamField>
+
+### Response fields
+
+Returns a JSON object containing:
+
+- `url` (string) - Website URL
+- `llms_txt` (string) - Generated llms.txt content
+- `pages_analyzed` (integer) - Number of pages analyzed
+- `structure` (object) - Site structure metadata
+- `generated_at` (string) - ISO 8601 timestamp
+
+### Examples
+
+<CodeGroup>
+```bash Generate to stdout
+stobo llms generate https://example.com
+```
+
+```bash Save to file
+stobo llms generate example.com --output llms.txt
+```
+
+```bash Short form
+stobo llms generate example.com -o llms.txt
+```
+
+```bash JSON output
+stobo llms generate example.com --json
+```
+</CodeGroup>
+
+---
+
+## What is llms.txt?
+
+The `llms.txt` file is a standardized format that helps AI crawlers understand your website structure and content hierarchy. It improves:
+
+- **AI discoverability** - Makes your content easier for LLMs to index
+- **Context accuracy** - Provides structured information about your site
+- **Citation quality** - Helps AI models reference your content correctly
+
+### File location
+
+Place the generated file at: `https://yourdomain.com/llms.txt`
+
+### Format example
+
+```txt
+# Example Site
+
+> A brief description of your website
+
+## Documentation
+- Getting Started: /docs/getting-started
+- API Reference: /docs/api
+
+## Blog
+- Latest Posts: /blog
+```
+
+---
+
+## Status codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 400 | Invalid URL |
+| 401 | Missing or invalid API key |
+| 429 | Rate limit exceeded |
+| 500 | Server error |
+
+## Related commands
+
+- [robots commands](/api/utility-commands#stobo-robots-generate) - Generate AI-optimized robots.txt
+- [sitemap commands](/api/utility-commands#stobo-sitemap-generate) - Generate sitemap.xml files

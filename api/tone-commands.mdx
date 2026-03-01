@@ -1,0 +1,187 @@
+---
+title: Tone commands
+description: Complete reference for all tone subcommands
+---
+
+The `tone` command group extracts and manages brand voice profiles from existing content.
+
+## stobo tone extract
+
+Extract brand voice characteristics from a blog by analyzing multiple articles.
+
+```bash
+stobo tone extract <blog_url> [options]
+```
+
+### Arguments
+
+<ParamField path="blog_url" type="string" required>
+  Blog URL to scrape for tone analysis. The CLI will discover and analyze articles from this URL.
+</ParamField>
+
+### Options
+
+<ParamField path="--customer-id" type="string">
+  Customer ID to associate with this brand voice profile. If not provided, a profile ID will be generated from the blog URL.
+  
+  **Alias:** `-c`
+</ParamField>
+
+<ParamField path="--max-articles" type="integer" default={10}>
+  Maximum number of articles to scrape and analyze. Higher values provide more accurate tone profiles but consume more credits.
+  
+  **Alias:** `-n`
+</ParamField>
+
+<ParamField path="--overwrite" type="boolean" default={false}>
+  Overwrite existing profile if one already exists for this customer ID. By default, extraction fails if a profile already exists.
+</ParamField>
+
+### Response fields
+
+Returns a JSON object containing:
+
+- `customer_id` (string) - Profile identifier
+- `blog_url` (string) - Source blog URL
+- `articles_analyzed` (integer) - Number of articles processed
+- `tone_profile` (object) - Extracted tone characteristics
+  - `voice` (string) - Voice description (e.g., "professional", "casual")
+  - `style` (array) - Writing style attributes
+  - `vocabulary` (array) - Common terms and phrases
+  - `sentence_structure` (string) - Typical sentence patterns
+- `created_at` (string) - ISO 8601 timestamp
+
+### Examples
+
+<CodeGroup>
+```bash Basic extraction
+stobo tone extract https://blog.example.com
+```
+
+```bash With customer ID
+stobo tone extract https://blog.example.com --customer-id acme-corp
+```
+
+```bash Analyze more articles
+stobo tone extract https://blog.example.com -n 20
+```
+
+```bash Overwrite existing profile
+stobo tone extract https://blog.example.com -c acme-corp --overwrite
+```
+
+```bash Combined options
+stobo tone extract https://blog.example.com -c acme-corp -n 15 --overwrite
+```
+</CodeGroup>
+
+---
+
+## stobo tone get
+
+Retrieve a stored brand voice profile by customer ID.
+
+```bash
+stobo tone get <customer_id>
+```
+
+### Arguments
+
+<ParamField path="customer_id" type="string" required>
+  Customer ID associated with the brand voice profile.
+</ParamField>
+
+### Response fields
+
+Returns the same structure as `tone extract`.
+
+### Examples
+
+<CodeGroup>
+```bash Get profile
+stobo tone get acme-corp
+```
+
+```bash JSON output
+stobo tone get acme-corp --json
+```
+</CodeGroup>
+
+---
+
+## stobo tone list
+
+List all stored brand voice profiles for your account.
+
+```bash
+stobo tone list
+```
+
+### Response fields
+
+Returns an array of customer IDs (strings).
+
+### Examples
+
+<CodeGroup>
+```bash List all profiles
+stobo tone list
+```
+
+```bash JSON output
+stobo tone list --json
+```
+</CodeGroup>
+
+---
+
+## stobo tone delete
+
+Delete a brand voice profile.
+
+```bash
+stobo tone delete <customer_id>
+```
+
+### Arguments
+
+<ParamField path="customer_id" type="string" required>
+  Customer ID of the profile to delete.
+</ParamField>
+
+### Examples
+
+```bash
+stobo tone delete acme-corp
+```
+
+---
+
+## Tone extraction algorithm
+
+The tone extraction process:
+
+1. **Article discovery** - Crawls the blog URL to find article links
+2. **Content scraping** - Fetches up to `max_articles` articles
+3. **Text analysis** - Extracts writing patterns, vocabulary, and style
+4. **Profile generation** - Creates a reusable brand voice profile
+5. **Storage** - Saves profile with customer ID for future optimization jobs
+
+---
+
+## Status codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 400 | Invalid blog URL or parameters |
+| 401 | Missing or invalid API key |
+| 404 | Profile not found |
+| 409 | Profile already exists (use `--overwrite`) |
+| 429 | Rate limit exceeded |
+| 500 | Server error |
+
+## Related commands
+
+- [optimize commands](/api/optimize-commands) - Use tone profiles in optimization
+- [export commands](/api/export-commands) - Export tone profiles to markdown

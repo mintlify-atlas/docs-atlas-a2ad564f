@@ -1,0 +1,256 @@
+---
+title: stobo tone
+description: Extract and manage brand voice profiles for consistent AI-generated content
+---
+
+## Overview
+
+The `stobo tone` command extracts your brand's unique voice from existing content and stores it as a reusable profile. This ensures AI-generated rewrites maintain your brand's personality, writing style, and messaging.
+
+<Info>
+  **Credit cost:** Tone extraction analyzes multiple articles and consumes credits based on the number of articles processed.
+</Info>
+
+---
+
+## Commands
+
+### stobo tone extract
+
+Extract brand voice from a blog or content section.
+
+```bash
+stobo tone extract <blog_url> [options]
+```
+
+<ParamField path="blog_url" type="string" required>
+  Blog URL to scrape and analyze for brand voice
+</ParamField>
+
+<ParamField path="--customer-id" type="string">
+  Customer ID to associate with this tone profile. Alias: `-c`
+</ParamField>
+
+<ParamField path="--max-articles" type="integer" default="10">
+  Maximum number of articles to analyze. Alias: `-n`
+</ParamField>
+
+<ParamField path="--overwrite" type="boolean" default="false">
+  Overwrite existing tone profile for this customer ID
+</ParamField>
+
+#### Example
+
+```bash
+# Extract tone from blog
+stobo tone extract https://example.com/blog --customer-id acme-corp
+
+# Analyze more articles for better accuracy
+stobo tone extract https://example.com/blog --customer-id acme-corp --max-articles 20
+
+# Update existing profile
+stobo tone extract https://example.com/blog --customer-id acme-corp --overwrite
+```
+
+<Steps>
+  <Step title="Blog discovery">
+    Stobo discovers articles from your blog URL.
+  </Step>
+  
+  <Step title="Content analysis">
+    AI analyzes up to `--max-articles` articles to extract tone patterns.
+  </Step>
+  
+  <Step title="Profile creation">
+    A brand voice profile is created with voice archetype, traits, and style guidelines.
+  </Step>
+  
+  <Step title="Storage">
+    Profile is stored and associated with the `--customer-id` for future use.
+  </Step>
+</Steps>
+
+#### Output
+
+```
+✓ Extracted from 10 articles
+
+╭─────────────────────────────────────────────────────────────╮
+│ Brand Voice Profile                                         │
+├─────────────────────────────────────────────────────────────┤
+│ Brand: Acme Corp                                            │
+│ Archetype: The Expert                                       │
+│ Pitch: Empowering developers with cutting-edge AI tools     │
+│ Articles analyzed: 10                                       │
+╰─────────────────────────────────────────────────────────────╯
+
+Core Traits:
+  • Technical but accessible
+  • Confident and authoritative
+  • Developer-focused
+  • Practical and actionable
+
+                        Do's & Don'ts
+┌─────────────────────────────────────┬─────────────────────────────────┐
+│ Do                                  │ Don't                           │
+├─────────────────────────────────────┼─────────────────────────────────┤
+│ Use code examples                   │ Use marketing fluff             │
+│ Explain technical concepts clearly  │ Oversimplify complex topics     │
+│ Address developers directly         │ Use passive voice excessively   │
+│ Include practical use cases         │ Make unsubstantiated claims     │
+└─────────────────────────────────────┴─────────────────────────────────┘
+
+Credits: 8,750 / 10,000 remaining | Resets 2026-04-01
+```
+
+<Note>
+  **More articles = better accuracy.** While the default is 10 articles, analyzing 15-20 articles produces more accurate brand voice profiles.
+</Note>
+
+---
+
+### stobo tone get
+
+Retrieve a stored brand voice profile.
+
+```bash
+stobo tone get <customer_id>
+```
+
+<ParamField path="customer_id" type="string" required>
+  Customer ID of the tone profile to retrieve
+</ParamField>
+
+#### Example
+
+```bash
+stobo tone get acme-corp
+```
+
+#### Output
+
+Displays the full tone profile (same format as `tone extract` output).
+
+---
+
+### stobo tone list
+
+List all stored brand voice profiles.
+
+```bash
+stobo tone list
+```
+
+#### Example
+
+```bash
+stobo tone list
+```
+
+#### Output
+
+```
+                   Tone Profiles
+┌─────┬──────────────────────────────────┐
+│   # │ Customer ID                      │
+├─────┼──────────────────────────────────┤
+│   1 │ acme-corp                        │
+│   2 │ beta-company                     │
+│   3 │ gamma-industries                 │
+└─────┴──────────────────────────────────┘
+```
+
+---
+
+### stobo tone delete
+
+Delete a brand voice profile.
+
+```bash
+stobo tone delete <customer_id>
+```
+
+<ParamField path="customer_id" type="string" required>
+  Customer ID of the tone profile to delete
+</ParamField>
+
+#### Example
+
+```bash
+stobo tone delete acme-corp
+```
+
+#### Output
+
+```
+✓ Deleted profile for acme-corp
+```
+
+<Warning>
+  **Deletion is permanent.** Once deleted, you'll need to run `tone extract` again to recreate the profile.
+</Warning>
+
+---
+
+## Understanding voice archetypes
+
+Stobo identifies one of several voice archetypes based on your content:
+
+- **The Expert**: Authoritative, knowledgeable, educational
+- **The Innovator**: Cutting-edge, forward-thinking, disruptive
+- **The Friend**: Conversational, approachable, empathetic
+- **The Leader**: Confident, inspiring, motivational
+- **The Analyst**: Data-driven, precise, methodical
+
+These archetypes help guide the tone and style of AI-generated content.
+
+---
+
+## Using tone profiles in optimization
+
+Once extracted, tone profiles are automatically used in optimization:
+
+```bash
+# Extract tone once
+stobo tone extract https://example.com/blog --customer-id acme-corp
+
+# Use in optimization
+stobo optimize run https://example.com/article --customer-id acme-corp
+```
+
+The `--customer-id` parameter links the optimization job to your brand voice profile.
+
+---
+
+## Best practices
+
+<Steps>
+  <Step title="Use diverse content">
+    Extract tone from a variety of articles that represent your full content spectrum.
+  </Step>
+  
+  <Step title="Analyze enough articles">
+    Use `--max-articles 15` or higher for more accurate profiles.
+  </Step>
+  
+  <Step title="Update periodically">
+    As your brand voice evolves, use `--overwrite` to refresh your tone profile.
+  </Step>
+  
+  <Step title="One profile per brand">
+    Use unique `customer-id` values for different brands or sub-brands.
+  </Step>
+</Steps>
+
+---
+
+## JSON output
+
+All tone commands support JSON output using the global `--json` flag:
+
+```bash
+stobo tone extract https://example.com/blog --customer-id acme-corp --json
+stobo tone get acme-corp --json
+```
+
+This returns structured data suitable for automation and analysis.

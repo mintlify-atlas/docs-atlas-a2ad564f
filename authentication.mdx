@@ -1,0 +1,253 @@
+---
+title: Authentication
+description: Set up your Stobo API key to unlock paid features like brand voice extraction, llms.txt generation, and content optimization.
+---
+
+## Overview
+
+While many Stobo CLI features are free (site audits, article audits), paid features require authentication with an API key:
+
+**Free features** (no API key):
+- Site audits (`stobo audit site`)
+- Article audits (`stobo audit run`)
+- Sitemap freshness checks (`stobo freshness run`)
+
+**Paid features** (API key required):
+- Brand voice extraction (`stobo tone extract`) - 500 credits
+- llms.txt generation (`stobo llms generate`) - 500 credits
+- Full optimization pipeline (`stobo optimize run`) - 1,000 credits
+- Report exports (`stobo export run`) - 200 credits
+
+## Get your API key
+
+<Steps>
+  <Step title="Sign up for Stobo">
+    Create an account at [trystobo.com](https://trystobo.com) if you haven't already.
+  </Step>
+  
+  <Step title="Navigate to API settings">
+    1. Log in to your Stobo account
+    2. Go to **Settings** → **API Keys**
+  </Step>
+  
+  <Step title="Create a new API key">
+    Click **Create new key** and copy your API key. It will start with `sk_`.
+    
+    <Warning>
+      Store your API key securely. You won't be able to see it again after creation.
+    </Warning>
+  </Step>
+</Steps>
+
+## Authenticate with Stobo CLI
+
+Once you have your API key, authenticate using the `stobo auth login` command.
+
+### Interactive login (recommended)
+
+Run the login command and enter your API key when prompted:
+
+```bash
+stobo auth login
+```
+
+You'll see:
+
+```
+API key (sk_...): ▌
+```
+
+Paste your API key (it will be hidden for security) and press Enter.
+
+<Info>
+  The CLI uses secure input—your API key won't be visible as you type.
+</Info>
+
+On success, you'll see:
+
+```
+✓ Logged in as user@example.com
+```
+
+### Non-interactive login
+
+For automation or CI/CD pipelines, pass the API key directly:
+
+<CodeGroup>
+```bash Flag
+stobo auth login --api-key sk_your_api_key_here
+```
+
+```bash Environment variable
+export STOBO_API_KEY=sk_your_api_key_here
+stobo auth login --api-key $STOBO_API_KEY
+```
+</CodeGroup>
+
+## Verify authentication
+
+Check your authentication status at any time:
+
+```bash
+stobo auth status
+```
+
+This displays:
+- Authentication status
+- Email address
+- Account name
+- Partial API key (first 8 characters)
+
+**Example output:**
+
+```
+✓ Authenticated
+  Email: user@example.com
+  Name:  John Doe
+  Key:   sk_abc123...
+```
+
+<Note>
+  If your stored key is invalid or expired, you'll see an error. Run `stobo auth login` again to authenticate with a new key.
+</Note>
+
+## API key storage
+
+Stobo CLI stores your API key securely in a configuration file:
+
+- **Location**: `~/.stobo/config.json`
+- **Permissions**: Automatically set to `600` (readable/writable by owner only)
+
+<Warning>
+  Never commit your API key to version control. The config file is automatically secured with restricted permissions.
+</Warning>
+
+## Override stored API key
+
+You can temporarily use a different API key without changing your stored configuration:
+
+<CodeGroup>
+```bash Command flag
+stobo --api-key sk_different_key tone extract https://blog.example.com
+```
+
+```bash Environment variable
+export STOBO_API_KEY=sk_different_key
+stobo tone extract https://blog.example.com
+```
+</CodeGroup>
+
+**Priority order**:
+1. `--api-key` flag (highest priority)
+2. `STOBO_API_KEY` environment variable
+3. Stored config file (lowest priority)
+
+## Check credit balance
+
+After authenticating, check your available credits:
+
+```bash
+stobo credits
+```
+
+This shows:
+- Current balance
+- Recent usage breakdown
+- Credit costs per operation
+
+**Example output:**
+
+```
+Credit Balance: 5,000
+
+Recent Usage:
+  Operation          Credits    Date
+  ────────────────────────────────────
+  tone extract       500        2026-03-01
+  optimize run       1,000      2026-02-28
+  llms generate      500        2026-02-27
+```
+
+## Logout
+
+To remove your stored API key:
+
+```bash
+stobo auth logout
+```
+
+This clears your authentication and deletes the stored API key from the config file.
+
+```
+✓ Logged out. API key removed.
+```
+
+<Tip>
+  You can still use free features (audits) after logging out.
+</Tip>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Invalid API key error">
+    If you see "Invalid API key" when logging in:
+    
+    1. Verify you copied the entire key (starts with `sk_`)
+    2. Check for extra spaces or line breaks
+    3. Ensure the key hasn't been revoked in your Stobo dashboard
+    4. Create a new API key if needed
+  </Accordion>
+  
+  <Accordion title="Authentication required error">
+    If a command fails with "Authentication required":
+    
+    1. Run `stobo auth status` to check if you're logged in
+    2. If not authenticated, run `stobo auth login`
+    3. If authenticated but still seeing errors, your key may be invalid—try logging in again
+  </Accordion>
+  
+  <Accordion title="Permission denied on config file">
+    If you can't write to `~/.stobo/config.json`:
+    
+    1. Check directory permissions: `ls -la ~/.stobo`
+    2. Create directory if missing: `mkdir -p ~/.stobo`
+    3. Fix permissions: `chmod 700 ~/.stobo`
+  </Accordion>
+  
+  <Accordion title="Using API key in CI/CD">
+    For automated environments (GitHub Actions, GitLab CI, etc.):
+    
+    1. Store your API key as a secret in your CI/CD platform
+    2. Use the environment variable method:
+       ```bash
+       export STOBO_API_KEY=${{ secrets.STOBO_API_KEY }}
+       stobo optimize run https://example.com/article
+       ```
+    3. Or use the `--api-key` flag directly:
+       ```bash
+       stobo --api-key ${{ secrets.STOBO_API_KEY }} optimize run https://example.com/article
+       ```
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+Now that you're authenticated, explore paid features:
+
+<CardGroup cols={2}>
+  <Card title="Brand voice extraction" icon="microphone" href="/features/brand-voice">
+    Extract your unique brand voice from your blog content
+  </Card>
+  
+  <Card title="Content optimization" icon="wand-magic-sparkles" href="/features/optimization">
+    Run full audit + tone + rewrite pipelines
+  </Card>
+  
+  <Card title="llms.txt generation" icon="robot" href="/features/llms-txt">
+    Generate llms.txt for AI discoverability
+  </Card>
+  
+  <Card title="Export reports" icon="file-export" href="/features/exports">
+    Generate and export markdown reports
+  </Card>
+</CardGroup>

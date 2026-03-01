@@ -1,0 +1,116 @@
+---
+title: Freshness commands
+description: Audit sitemap freshness and generate schema markup
+---
+
+The `stobo freshness` and `stobo freshness-code` commands help you audit sitemap freshness and generate Article/BlogPosting JSON-LD schema with proper date metadata.
+
+## stobo freshness run
+
+Run a freshness audit on a sitemap to check date accuracy and schema markup.
+
+```bash
+stobo freshness run <sitemap_url> [OPTIONS]
+```
+
+<ParamField path="sitemap_url" type="string" required>
+  URL of the sitemap to audit
+</ParamField>
+
+### Options
+
+<ParamField path="--limit" type="integer" default="50">
+  Maximum number of URLs to check from the sitemap
+  
+  **Alias:** `-n`
+</ParamField>
+
+<ParamField path="--force" type="boolean">
+  Bypass 24-hour cache and force a fresh audit
+</ParamField>
+
+### Examples
+
+Audit a sitemap with default settings:
+
+```bash
+stobo freshness run https://example.com/sitemap.xml
+```
+
+Check the first 100 URLs:
+
+```bash
+stobo freshness run https://example.com/sitemap.xml --limit 100
+```
+
+Force a fresh audit bypassing cache:
+
+```bash
+stobo freshness run https://example.com/sitemap.xml --force
+```
+
+<Note>
+  Freshness audits are cached for 24 hours. Use `--force` to regenerate immediately.
+</Note>
+
+## stobo freshness get
+
+Retrieve a previously run freshness audit by its ID.
+
+```bash
+stobo freshness get <audit_id>
+```
+
+<ParamField path="audit_id" type="string" required>
+  UUID of the freshness audit to retrieve
+</ParamField>
+
+### Examples
+
+Get a freshness audit by ID:
+
+```bash
+stobo freshness get 550e8400-e29b-41d4-a716-446655440000
+```
+
+## stobo freshness-code generate
+
+Generate Article/BlogPosting JSON-LD schema with `datePublished` and `dateModified` fields for a specific page.
+
+```bash
+stobo freshness-code generate <url> [OPTIONS]
+```
+
+<ParamField path="url" type="string" required>
+  URL of the page to generate schema for
+</ParamField>
+
+### Options
+
+<ParamField path="--output" type="string">
+  Save the generated JSON-LD schema to a file
+  
+  **Alias:** `-o`
+</ParamField>
+
+### Examples
+
+Generate schema for a blog post:
+
+```bash
+stobo freshness-code generate https://example.com/blog/my-article
+```
+
+Generate schema and save to file:
+
+```bash
+stobo freshness-code generate https://example.com/blog/my-article --output schema.json
+```
+
+<Tip>
+  The generated JSON-LD schema includes accurate date metadata extracted from the page content, helping search engines understand your content freshness.
+</Tip>
+
+<Info>
+  Use this command to automatically generate proper schema markup for articles and blog posts, ensuring search engines see accurate publish and modification dates.
+</Info>

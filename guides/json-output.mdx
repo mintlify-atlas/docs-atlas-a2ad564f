@@ -1,0 +1,247 @@
+---
+title: JSON output
+description: Use JSON mode for automation and scripting
+---
+
+Stobo CLI supports JSON output mode for all commands, making it easy to integrate with scripts, CI/CD pipelines, and other automation tools.
+
+## Enabling JSON mode
+
+Add the `--json` flag before any command to get machine-readable JSON output instead of formatted terminal output:
+
+```bash
+stobo --json <command>
+```
+
+<Note>
+The `--json` flag must come **before** the command name, as it's a global option.
+</Note>
+
+## Examples
+
+### Article audit
+
+```bash
+stobo --json audit run https://example.com/article
+```
+
+**Output:**
+
+```json
+{
+  "id": "aud_abc123",
+  "url": "https://example.com/article",
+  "grade": "B",
+  "percentage": 78.5,
+  "category_scores": {
+    "content_quality": 85,
+    "technical_seo": 72,
+    "keyword_optimization": 80
+  },
+  "recommendations": [
+    {
+      "check": "meta_description",
+      "priority": "high",
+      "message": "Meta description is too short (45 chars)"
+    }
+  ],
+  "created_at": "2026-03-01T12:00:00Z"
+}
+```
+
+### Credits
+
+```bash
+stobo --json credits
+```
+
+**Output:**
+
+```json
+{
+  "plan": "professional",
+  "remaining": 1250,
+  "total": 5000,
+  "reset_date": "2026-04-01",
+  "breakdown": {
+    "audit_run": 450,
+    "optimize_run": 300
+  }
+}
+```
+
+### Site audit
+
+```bash
+stobo --json audit site https://example.com
+```
+
+**Output:**
+
+```json
+{
+  "domain": "example.com",
+  "combined_percentage": 82.3,
+  "cached": false,
+  "seo_audit": {
+    "grade": "B",
+    "total_points": 312,
+    "max_points": 380,
+    "category_scores": {
+      "technical": {
+        "score": 85,
+        "max_points": 100,
+        "percentage": 85
+      }
+    }
+  },
+  "aeo_audit": {
+    "score": 98,
+    "max_points": 135,
+    "percentage": 72.6,
+    "robots_ai": {
+      "status": "excellent",
+      "score": 25,
+      "max_points": 25,
+      "message": "AI crawlers allowed"
+    }
+  }
+}
+```
+
+## Automation use cases
+
+### CI/CD integration
+
+Check SEO scores in your deployment pipeline:
+
+```bash
+#!/bin/bash
+
+# Run audit and capture JSON
+result=$(stobo --json audit run $DEPLOY_URL)
+
+# Extract grade
+grade=$(echo $result | jq -r '.grade')
+
+# Fail if grade is below threshold
+if [[ "$grade" == "D" || "$grade" == "F" ]]; then
+  echo "SEO audit failed with grade $grade"
+  exit 1
+fi
+
+echo "SEO audit passed with grade $grade"
+```
+
+### Monitoring credits
+
+```bash
+#!/bin/bash
+
+# Get credit data
+credits=$(stobo --json credits)
+
+# Calculate percentage
+remaining=$(echo $credits | jq '.remaining')
+total=$(echo $credits | jq '.total')
+pct=$(echo "scale=2; $remaining / $total * 100" | bc)
+
+# Alert if low
+if (( $(echo "$pct < 20" | bc -l) )); then
+  echo "Warning: Only ${pct}% credits remaining"
+fi
+```
+
+### Batch processing
+
+Audit multiple URLs and collect results:
+
+```bash
+#!/bin/bash
+
+output="audit-results.json"
+echo '[' > $output
+
+while IFS= read -r url; do
+  echo "Auditing $url..."
+  stobo --json audit run "$url" >> $output
+  echo ',' >> $output
+done < urls.txt
+
+echo ']' >> $output
+```
+
+## Parsing JSON
+
+### Using jq
+
+[jq](https://jqlang.github.io/jq/) is a powerful command-line JSON processor:
+
+```bash
+# Extract specific field
+stobo --json credits | jq '.remaining'
+
+# Get grade from audit
+stobo --json audit run $URL | jq -r '.grade'
+
+# List all high-priority recommendations
+stobo --json audit run $URL | jq '.recommendations[] | select(.priority == "high")'
+
+# Format as CSV
+stobo --json audit list | jq -r '.[] | [.id, .url, .grade, .percentage] | @csv'
+```
+
+### Using Python
+
+```python
+import json
+import subprocess
+
+# Run command and capture output
+result = subprocess.run(
+    ['stobo', '--json', 'credits'],
+    capture_output=True,
+    text=True
+)
+
+# Parse JSON
+data = json.loads(result.stdout)
+
+print(f"Credits remaining: {data['remaining']} / {data['total']}")
+print(f"Plan: {data['plan']}")
+```
+
+### Using Node.js
+
+```javascript
+const { execSync } = require('child_process');
+
+// Run command and parse output
+const output = execSync('stobo --json audit run https://example.com', {
+  encoding: 'utf-8'
+});
+
+const data = JSON.parse(output);
+
+console.log(`Grade: ${data.grade}`);
+console.log(`Score: ${data.percentage}%`);
+```
+
+## Tips
+
+<Tip>
+Always use the `--json` flag **before** the command name: `stobo --json credits`, not `stobo credits --json`.
+</Tip>
+
+<Tip>
+JSON output includes all data from the formatted output, often with additional fields not shown in the terminal view.
+</Tip>
+
+<Warning>
+JSON output goes to stdout, while errors still go to stderr. Make sure to handle both streams in your scripts.
+</Warning>
+
+## Related
+
+- [Configuration](/guides/configuration) - Environment variables and config files
+- [Troubleshooting](/guides/troubleshooting) - Common issues and solutions

@@ -1,0 +1,289 @@
+---
+title: stobo llms
+description: Generate llms.txt files for AI discoverability and answer engine optimization
+---
+
+## Overview
+
+The `stobo llms` command generates [llms.txt](https://llmstxt.org/) files that help AI systems and answer engines discover and understand your website's content. This structured format improves your visibility in AI-powered search results and chatbots.
+
+<Info>
+  **Credit cost:** Generating llms.txt files consumes credits based on website size and content analysis.
+</Info>
+
+---
+
+## Commands
+
+### stobo llms generate
+
+Generate an llms.txt file for your website.
+
+```bash
+stobo llms generate <url> [options]
+```
+
+<ParamField path="url" type="string" required>
+  Website URL to analyze and generate llms.txt from
+</ParamField>
+
+<ParamField path="--output" type="string">
+  Save generated file to a specific path. Alias: `-o`
+</ParamField>
+
+#### Example
+
+```bash
+# Generate and display llms.txt
+stobo llms generate https://example.com
+
+# Generate and save to file
+stobo llms generate https://example.com --output llms.txt
+
+# Save to specific directory
+stobo llms generate https://example.com -o ./public/llms.txt
+```
+
+<Steps>
+  <Step title="Website discovery">
+    Stobo crawls your website to discover pages, content, and structure.
+  </Step>
+  
+  <Step title="Content analysis">
+    AI analyzes your content to extract key information, topics, and documentation.
+  </Step>
+  
+  <Step title="llms.txt generation">
+    A structured llms.txt file is generated following the [llmstxt.org](https://llmstxt.org/) specification.
+  </Step>
+  
+  <Step title="Output or save">
+    Content is displayed or saved to the specified file path.
+  </Step>
+</Steps>
+
+#### Output (without --output)
+
+```
+╭─────────────────────────────────────────────────────────────╮
+│ llms.txt Generated                                          │
+├─────────────────────────────────────────────────────────────┤
+│ Domain: example.com                                         │
+│ Title: Example Corp - AI-Powered Developer Tools            │
+│ Words: 1,247  Sections: 8                                   │
+╰─────────────────────────────────────────────────────────────╯
+
+# Example Corp
+
+> AI-Powered Developer Tools
+
+Example Corp provides cutting-edge AI tools for developers.
+Our platform helps teams build, optimize, and scale AI applications.
+
+## Products
+
+### AI Code Assistant
+Intelligent code completion and refactoring powered by advanced AI models.
+- Supports 20+ programming languages
+- Real-time suggestions
+- Security vulnerability detection
+
+### Data Analytics Platform
+AI-driven insights from your application data.
+- Custom dashboards
+- Predictive analytics
+- Automated reporting
+
+## Documentation
+
+Full documentation available at https://example.com/docs
+
+...
+
+Credits: 9,200 / 10,000 remaining | Resets 2026-04-01
+```
+
+#### Output (with --output)
+
+```
+╭─────────────────────────────────────────────────────────────╮
+│ llms.txt Generated                                          │
+├─────────────────────────────────────────────────────────────┤
+│ Domain: example.com                                         │
+│ Title: Example Corp - AI-Powered Developer Tools            │
+│ Words: 1,247  Sections: 8                                   │
+╰─────────────────────────────────────────────────────────────╯
+
+✓ Saved to llms.txt
+
+Credits: 9,200 / 10,000 remaining | Resets 2026-04-01
+```
+
+<Note>
+  The generated llms.txt file should be placed at the root of your domain: `https://yourdomain.com/llms.txt`
+</Note>
+
+---
+
+## What is llms.txt?
+
+The [llms.txt standard](https://llmstxt.org/) is a simple, structured text format designed to help AI systems understand your website:
+
+- **Human-readable**: Plain markdown format
+- **AI-optimized**: Structured for LLM consumption
+- **Comprehensive**: Covers products, docs, APIs, and key content
+- **Discoverable**: Served at `/llms.txt` on your domain
+
+### Why use llms.txt?
+
+<Steps>
+  <Step title="Improve AI discoverability">
+    Help AI assistants like ChatGPT, Claude, and Perplexity understand your content.
+  </Step>
+  
+  <Step title="Better answer engine results">
+    Increase chances of being cited in AI-generated answers.
+  </Step>
+  
+  <Step title="Control your AI presence">
+    Define exactly what information AI systems should know about your brand.
+  </Step>
+  
+  <Step title="SEO for the AI era">
+    Optimize for answer engines, not just search engines.
+  </Step>
+</Steps>
+
+---
+
+## Deployment
+
+After generating your llms.txt file:
+
+<Steps>
+  <Step title="Save to your website root">
+    Place the file at `https://yourdomain.com/llms.txt`
+    
+    ```bash
+    # For static sites
+    stobo llms generate https://example.com -o ./public/llms.txt
+    
+    # For Node.js/Express
+    stobo llms generate https://example.com -o ./public/llms.txt
+    
+    # For Python/Django
+    stobo llms generate https://example.com -o ./static/llms.txt
+    ```
+  </Step>
+  
+  <Step title="Verify accessibility">
+    Ensure the file is publicly accessible at your domain root.
+    
+    ```bash
+    curl https://yourdomain.com/llms.txt
+    ```
+  </Step>
+  
+  <Step title="Update robots.txt (optional)">
+    Reference your llms.txt in robots.txt:
+    
+    ```
+    Sitemap: https://yourdomain.com/sitemap.xml
+    
+    # AI Discoverability
+    User-agent: *
+    Allow: /llms.txt
+    ```
+  </Step>
+  
+  <Step title="Keep it updated">
+    Regenerate periodically as your content evolves.
+    
+    ```bash
+    # Monthly update
+    stobo llms generate https://example.com -o ./public/llms.txt
+    ```
+  </Step>
+</Steps>
+
+---
+
+## CI/CD integration
+
+Automate llms.txt generation in your deployment pipeline:
+
+### GitHub Actions
+
+```yaml
+name: Update llms.txt
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'  # Monthly
+  workflow_dispatch:
+
+jobs:
+  update-llms:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Stobo CLI
+        run: pip install stobo
+      
+      - name: Generate llms.txt
+        env:
+          STOBO_API_KEY: ${{ secrets.STOBO_API_KEY }}
+        run: stobo llms generate https://yourdomain.com -o ./public/llms.txt
+      
+      - name: Commit changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add public/llms.txt
+          git commit -m "chore: update llms.txt" || exit 0
+          git push
+```
+
+---
+
+## JSON output
+
+Use JSON output for programmatic access:
+
+```bash
+stobo llms generate https://example.com --json
+```
+
+Returns:
+
+```json
+{
+  "domain": "example.com",
+  "title": "Example Corp - AI-Powered Developer Tools",
+  "content": "# Example Corp\n\n> AI-Powered Developer Tools\n...",
+  "word_count": 1247,
+  "sections": 8,
+  "generated_at": "2026-03-01T12:34:56Z"
+}
+```
+
+---
+
+## Best practices
+
+<Note>
+  **Keep it concise**: Aim for 1,000-2,000 words covering your key offerings.
+</Note>
+
+<Note>
+  **Update regularly**: Regenerate monthly or when major content changes occur.
+</Note>
+
+<Note>
+  **Test with AI**: Ask ChatGPT or Claude about your company to see if they reference your llms.txt.
+</Note>
+
+<Warning>
+  **Don't include sensitive data**: llms.txt is public. Only include information you want AI systems to know.
+</Warning>

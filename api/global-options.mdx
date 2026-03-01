@@ -1,0 +1,172 @@
+---
+title: Global options
+description: Document global flags available for all commands
+---
+
+Global options can be used with any Stobo CLI command. They must be specified **before** the subcommand.
+
+## Syntax
+
+```bash
+stobo [global options] <command> [command options]
+```
+
+---
+
+## --api-key
+
+Override the API key for the current command.
+
+<ParamField path="--api-key" type="string">
+  Stobo API key (starts with `sk_`). Takes precedence over `STOBO_API_KEY` environment variable and `~/.stobo/config.json`.
+</ParamField>
+
+### Examples
+
+<CodeGroup>
+```bash Override API key
+stobo --api-key sk_test_abc123 audit run https://example.com
+```
+
+```bash Different key per command
+stobo --api-key sk_test_key1 audit run example.com
+stobo --api-key sk_test_key2 tone extract blog.example.com
+```
+</CodeGroup>
+
+---
+
+## --base-url
+
+Override the API base URL for the current command.
+
+<ParamField path="--base-url" type="string" default="https://api.trystobo.com">
+  API base URL. Useful for testing against staging environments or self-hosted instances.
+</ParamField>
+
+### Examples
+
+<CodeGroup>
+```bash Use staging API
+stobo --base-url https://staging-api.trystobo.com audit run example.com
+```
+
+```bash Local development
+stobo --base-url http://localhost:8000 audit run example.com
+```
+
+```bash Combined with API key
+stobo --base-url https://custom.api.com --api-key sk_custom_123 audit run example.com
+```
+</CodeGroup>
+
+---
+
+## --json
+
+Output raw JSON instead of formatted terminal output.
+
+<ParamField path="--json" type="boolean" default={false}>
+  Enable JSON output mode. Useful for scripting, automation, and piping to other tools like `jq`.
+</ParamField>
+
+### Examples
+
+<CodeGroup>
+```bash JSON output
+stobo --json audit run https://example.com
+```
+
+```bash Parse with jq
+stobo --json audit run example.com | jq '.audit_id'
+```
+
+```bash Save to file
+stobo --json audit run example.com > audit.json
+```
+
+```bash Multiple commands
+stobo --json audit list
+stobo --json tone list
+stobo --json optimize jobs
+```
+</CodeGroup>
+
+---
+
+## --version
+
+Display the CLI version and exit.
+
+<ParamField path="--version" type="boolean">
+  Show version information. This is an eager option that executes before any subcommand.
+</ParamField>
+
+### Examples
+
+```bash
+stobo --version
+# Output: stobo 0.3.7
+```
+
+---
+
+## Priority order
+
+Global options are resolved in this priority order (highest to lowest):
+
+### API key
+
+1. `--api-key` flag (highest priority)
+2. `STOBO_API_KEY` environment variable
+3. `~/.stobo/config.json` file (lowest priority)
+
+### Base URL
+
+1. `--base-url` flag (highest priority)
+2. `STOBO_BASE_URL` environment variable
+3. `~/.stobo/config.json` file
+4. Default: `https://api.trystobo.com` (lowest priority)
+
+---
+
+## Context object
+
+Global options are stored in a Typer context object and passed to all subcommands:
+
+```python
+ctx.obj["json"] = json_output
+ctx.obj["client"] = StoboClient(api_key=resolved_key, base_url=resolved_url)
+```
+
+This allows subcommands to access:
+
+- `ctx.obj["json"]` - JSON output mode flag
+- `ctx.obj["client"]` - Configured HTTP client instance
+
+---
+
+## Examples
+
+### Combining multiple global options
+
+<CodeGroup>
+```bash All options
+stobo --api-key sk_test_abc --base-url https://staging.api.com --json audit run example.com
+```
+
+```bash JSON with custom key
+stobo --api-key sk_prod_xyz --json optimize jobs --status completed
+```
+
+```bash Testing environment
+stobo --base-url http://localhost:8000 --json audit run example.com | jq
+```
+</CodeGroup>
+
+---
+
+## Related topics
+
+- [environment variables](/api/environment-variables) - Configure via environment
+- [auth commands](/api/auth-commands) - Manage stored API keys

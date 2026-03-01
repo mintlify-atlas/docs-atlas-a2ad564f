@@ -1,0 +1,337 @@
+---
+title: Utility commands
+description: Complete reference for freshness, robots, sitemap, and MCP commands
+---
+
+Utility commands provide additional tools for SEO, AEO, and developer integrations.
+
+## Freshness commands
+
+### stobo freshness run
+
+Audit a sitemap for freshness signals and schema markup.
+
+```bash
+stobo freshness run <sitemap_url> [options]
+```
+
+#### Arguments
+
+<ParamField path="sitemap_url" type="string" required>
+  Sitemap XML URL to audit for freshness signals.
+</ParamField>
+
+#### Options
+
+<ParamField path="--limit" type="integer" default={50}>
+  Maximum number of URLs to check from the sitemap.
+  
+  **Alias:** `-n`
+</ParamField>
+
+<ParamField path="--force" type="boolean" default={false}>
+  Bypass 24-hour cache and force a fresh audit.
+</ParamField>
+
+#### Examples
+
+<CodeGroup>
+```bash Basic audit
+stobo freshness run https://example.com/sitemap.xml
+```
+
+```bash Limit URLs checked
+stobo freshness run example.com/sitemap.xml --limit 100
+```
+
+```bash Force refresh
+stobo freshness run example.com/sitemap.xml --force
+```
+</CodeGroup>
+
+---
+
+### stobo freshness get
+
+Retrieve a freshness audit by ID.
+
+```bash
+stobo freshness get <audit_id>
+```
+
+#### Arguments
+
+<ParamField path="audit_id" type="string" required>
+  Freshness audit UUID.
+</ParamField>
+
+---
+
+### stobo freshness-code generate
+
+Generate Article/BlogPosting JSON-LD schema with freshness signals.
+
+```bash
+stobo freshness-code generate <url> [options]
+```
+
+#### Arguments
+
+<ParamField path="url" type="string" required>
+  Page URL to generate schema for.
+</ParamField>
+
+#### Options
+
+<ParamField path="--output" type="string">
+  Save JSON-LD schema to a file.
+  
+  **Alias:** `-o`
+</ParamField>
+
+#### Examples
+
+<CodeGroup>
+```bash Generate schema
+stobo freshness-code generate https://blog.example.com/post
+```
+
+```bash Save to file
+stobo freshness-code generate example.com/article -o schema.json
+```
+</CodeGroup>
+
+---
+
+## Robots commands
+
+### stobo robots generate
+
+Generate an AI-crawler-optimized `robots.txt` file.
+
+```bash
+stobo robots generate <url> [options]
+```
+
+#### Arguments
+
+<ParamField path="url" type="string" required>
+  Website URL to generate robots.txt for.
+</ParamField>
+
+#### Options
+
+<ParamField path="--output" type="string">
+  Save robots.txt content to a file.
+  
+  **Alias:** `-o`
+</ParamField>
+
+#### Response fields
+
+Returns a JSON object containing:
+
+- `url` (string) - Website URL
+- `robots_txt` (string) - Generated robots.txt content
+- `ai_crawlers` (array) - List of AI crawler user agents included
+- `generated_at` (string) - ISO 8601 timestamp
+
+#### Examples
+
+<CodeGroup>
+```bash Generate robots.txt
+stobo robots generate https://example.com
+```
+
+```bash Save to file
+stobo robots generate example.com --output robots.txt
+```
+
+```bash JSON output
+stobo robots generate example.com --json
+```
+</CodeGroup>
+
+---
+
+## Sitemap commands
+
+### stobo sitemap generate
+
+Generate a `sitemap.xml` by crawling a website's internal pages.
+
+```bash
+stobo sitemap generate <url> [options]
+```
+
+#### Arguments
+
+<ParamField path="url" type="string" required>
+  Website URL to crawl for sitemap generation.
+</ParamField>
+
+#### Options
+
+<ParamField path="--output" type="string">
+  Save sitemap.xml content to a file.
+  
+  **Alias:** `-o`
+</ParamField>
+
+<ParamField path="--max-urls" type="integer" default={200}>
+  Maximum number of URLs to discover (10-500).
+  
+  **Alias:** `-n`
+</ParamField>
+
+#### Response fields
+
+Returns a JSON object containing:
+
+- `url` (string) - Root URL crawled
+- `sitemap_xml` (string) - Generated sitemap.xml content
+- `urls_found` (integer) - Number of URLs discovered
+- `generated_at` (string) - ISO 8601 timestamp
+
+#### Examples
+
+<CodeGroup>
+```bash Generate sitemap
+stobo sitemap generate https://example.com
+```
+
+```bash Limit URLs
+stobo sitemap generate example.com --max-urls 500
+```
+
+```bash Save to file
+stobo sitemap generate example.com -o sitemap.xml
+```
+
+```bash Combined options
+stobo sitemap generate example.com -n 300 -o sitemap.xml
+```
+</CodeGroup>
+
+---
+
+## MCP commands
+
+### stobo mcp install
+
+Install Stobo MCP server for Claude Desktop and Cursor.
+
+```bash
+stobo mcp install [options]
+```
+
+#### Options
+
+<ParamField path="--api-key" type="string">
+  Stobo API key to configure in MCP server. Optional for free tools.
+  
+  **Alias:** `-k`
+</ParamField>
+
+#### Behavior
+
+1. Locates `stobo-mcp` binary via `which`
+2. Updates configuration files for both Claude Desktop and Cursor
+3. Configures environment variables (`STOBO_API_KEY`, `STOBO_BASE_URL`)
+
+#### Configuration paths
+
+| Platform | Claude Desktop | Cursor |
+|----------|----------------|--------|
+| **macOS** | `~/Library/Application Support/Claude/claude_desktop_config.json` | `~/.cursor/mcp.json` |
+| **Windows** | `%APPDATA%\Claude\claude_desktop_config.json` | `~/.cursor/mcp.json` |
+| **Linux** | `~/.config/Claude/claude_desktop_config.json` | `~/.cursor/mcp.json` |
+
+#### Free tools available without API key
+
+- `audit_site`
+- `audit_article`
+- `robots.txt` generation
+- `sitemap` generation
+- `freshness_code` generation
+
+#### Examples
+
+<CodeGroup>
+```bash Install without API key (free tools only)
+stobo mcp install
+```
+
+```bash Install with API key (all tools)
+stobo mcp install --api-key sk_test_abc123
+```
+
+```bash Short form
+stobo mcp install -k sk_test_abc123
+```
+</CodeGroup>
+
+---
+
+### stobo mcp uninstall
+
+Remove Stobo MCP server from Claude Desktop and Cursor.
+
+```bash
+stobo mcp uninstall
+```
+
+#### Behavior
+
+Removes the `stobo` entry from `mcpServers` in both configuration files.
+
+---
+
+## Credits command
+
+### stobo credits
+
+View current credit usage and balance.
+
+```bash
+stobo credits
+```
+
+#### Response fields
+
+Displays:
+
+- **Total credits** - Total credits allocated
+- **Used credits** - Credits consumed
+- **Remaining credits** - Available balance
+- **Usage breakdown** - Credits per feature
+
+#### Examples
+
+<CodeGroup>
+```bash View credits
+stobo credits
+```
+
+```bash JSON output
+stobo credits --json
+```
+</CodeGroup>
+
+---
+
+## Status codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 400 | Invalid parameters |
+| 401 | Missing or invalid API key |
+| 404 | Resource not found |
+| 429 | Rate limit exceeded |
+| 500 | Server error |
+
+## Related commands
+
+- [audit commands](/api/audit-commands) - Core audit functionality
+- [llms commands](/api/llms-commands) - Generate llms.txt files

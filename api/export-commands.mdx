@@ -1,0 +1,168 @@
+---
+title: Export commands
+description: Complete reference for all export subcommands
+---
+
+The `export` command group generates and retrieves markdown reports for various data types.
+
+## stobo export run
+
+Generate a comprehensive markdown export report.
+
+```bash
+stobo export run <customer_id> <data_type> [options]
+```
+
+### Arguments
+
+<ParamField path="customer_id" type="string" required>
+  Customer ID associated with the data to export.
+</ParamField>
+
+<ParamField path="data_type" type="string" required>
+  Type of export to generate. Valid values:
+  - `brand_voice` - Brand voice profile report
+  - `seo_audit` - SEO audit report
+  - `article_rewrite` - Article rewrite comparison report
+</ParamField>
+
+### Options
+
+<ParamField path="--output" type="string">
+  Save the markdown content to a file instead of printing to stdout.
+  
+  **Alias:** `-o`
+</ParamField>
+
+<ParamField path="--force" type="boolean" default={false}>
+  Regenerate the report even if a cached version exists. By default, exports are cached for 24 hours.
+</ParamField>
+
+### Response fields
+
+Returns a JSON object containing:
+
+- `customer_id` (string)
+- `data_type` (string)
+- `markdown` (string) - Generated markdown content
+- `cached` (boolean) - Whether this is a cached result
+- `generated_at` (string) - ISO 8601 timestamp
+
+### Examples
+
+<CodeGroup>
+```bash Export brand voice
+stobo export run acme-corp brand_voice
+```
+
+```bash Save to file
+stobo export run acme-corp seo_audit --output report.md
+```
+
+```bash Force regenerate
+stobo export run acme-corp brand_voice --force
+```
+
+```bash Combined options
+stobo export run acme-corp article_rewrite -o rewrite.md --force
+```
+</CodeGroup>
+
+---
+
+## stobo export get
+
+Retrieve a cached export report without regenerating.
+
+```bash
+stobo export get <customer_id> <data_type> [options]
+```
+
+### Arguments
+
+<ParamField path="customer_id" type="string" required>
+  Customer ID associated with the export.
+</ParamField>
+
+<ParamField path="data_type" type="string" required>
+  Type of export to retrieve: `brand_voice`, `seo_audit`, or `article_rewrite`.
+</ParamField>
+
+### Options
+
+<ParamField path="--output" type="string">
+  Save the markdown content to a file.
+  
+  **Alias:** `-o`
+</ParamField>
+
+### Examples
+
+<CodeGroup>
+```bash Get cached export
+stobo export get acme-corp brand_voice
+```
+
+```bash Save to file
+stobo export get acme-corp seo_audit -o report.md
+```
+</CodeGroup>
+
+---
+
+## Export types
+
+### brand_voice
+
+Generates a detailed markdown report of the brand voice profile including:
+
+- Voice characteristics
+- Writing style patterns
+- Vocabulary analysis
+- Example phrases
+- Tone recommendations
+
+### seo_audit
+
+Generates a comprehensive SEO audit report with:
+
+- Technical SEO issues
+- On-page optimization recommendations
+- Keyword analysis
+- Meta tag suggestions
+- Performance metrics
+
+### article_rewrite
+
+Generates a before/after comparison report showing:
+
+- Original vs. rewritten content
+- Changes made
+- Issues fixed
+- SEO improvements
+- AEO enhancements
+
+---
+
+## Caching behavior
+
+Exports are cached for **24 hours** to improve performance and reduce API costs. Use `--force` to bypass the cache and regenerate.
+
+---
+
+## Status codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 400 | Invalid data type |
+| 401 | Missing or invalid API key |
+| 404 | Customer ID or export not found |
+| 429 | Rate limit exceeded |
+| 500 | Server error |
+
+## Related commands
+
+- [audit commands](/api/audit-commands) - Generate audit data for export
+- [tone commands](/api/tone-commands) - Create brand voice profiles for export
+- [optimize commands](/api/optimize-commands) - Generate rewrite data for export

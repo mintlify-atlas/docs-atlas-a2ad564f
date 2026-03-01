@@ -1,0 +1,126 @@
+{
+  "projectType": "cli-tool",
+  "projectName": "Stobo CLI",
+  "projectDescription": "AI-powered SEO and AEO audit tool for the terminal",
+  "theme": "aspen",
+  "primaryColor": "#0EA5E9",
+  "lightColor": "#38BDF8",
+  "darkColor": "#0284C7",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Core Commands",
+            "pages": [
+              "commands/audit",
+              "commands/optimize",
+              "commands/tone",
+              "commands/llms"
+            ]
+          },
+          {
+            "group": "Utility Commands",
+            "pages": [
+              "commands/export",
+              "commands/freshness",
+              "commands/robots",
+              "commands/sitemap",
+              "commands/mcp"
+            ]
+          },
+          {
+            "group": "Management",
+            "pages": [
+              "commands/auth",
+              "commands/credits"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/json-output",
+              "guides/configuration",
+              "guides/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Command Reference",
+            "pages": [
+              "api/audit-commands",
+              "api/optimize-commands",
+              "api/tone-commands",
+              "api/llms-commands",
+              "api/auth-commands",
+              "api/export-commands",
+              "api/utility-commands"
+            ]
+          },
+          {
+            "group": "Global Options",
+            "pages": [
+              "api/global-options",
+              "api/environment-variables"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Free SEO and AEO audits without API key",
+    "Site-wide and article-level SEO analysis",
+    "AI-powered content optimization pipeline",
+    "Brand voice extraction from blogs",
+    "llms.txt generation for AI discoverability",
+    "Rich terminal output with progress indicators",
+    "JSON output mode for automation",
+    "Credit-based paid features with transparent pricing",
+    "Sitemap and robots.txt analysis",
+    "MCP server integration support"
+  ],
+  "publicApiSurface": [
+    "stobo audit site <url>",
+    "stobo audit run <url>",
+    "stobo audit list",
+    "stobo audit get <id>",
+    "stobo audit get-url <url>",
+    "stobo auth login",
+    "stobo auth logout",
+    "stobo auth status",
+    "stobo credits",
+    "stobo tone extract <blog-url>",
+    "stobo tone get <customer-id>",
+    "stobo tone list",
+    "stobo tone delete <customer-id>",
+    "stobo llms generate <url>",
+    "stobo optimize run <url>",
+    "stobo optimize status <job-id>",
+    "stobo optimize preview <job-id>",
+    "stobo optimize jobs",
+    "stobo export run <cid> <type>",
+    "stobo export get <cid> <type>",
+    "stobo freshness run <sitemap>",
+    "stobo freshness-code generate <url>",
+    "stobo robots generate <url>",
+    "stobo sitemap generate <url>",
+    "stobo mcp install",
+    "stobo mcp uninstall",
+    "stobo mcp config"
+  ]
+}

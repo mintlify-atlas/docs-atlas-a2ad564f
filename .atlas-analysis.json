@@ -120,7 +120,6 @@
     "stobo robots generate <url>",
     "stobo sitemap generate <url>",
     "stobo mcp install",
-    "stobo mcp uninstall",
-    "stobo mcp config"
+    "stobo mcp uninstall"
   ]
 }
